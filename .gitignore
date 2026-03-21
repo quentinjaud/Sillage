@@ -39,6 +39,9 @@ yarn-error.log*
 # claude code - local only (settings.json and launch.json are shared)
 .claude/settings.local.json
 
+# prisma generated client
+/src/generated
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
