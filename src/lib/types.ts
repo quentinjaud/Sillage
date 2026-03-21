@@ -50,6 +50,29 @@ export interface TraceAvecPoints {
   }[];
 }
 
+/** Resume d'un bateau (pour la liste) */
+export interface ResumeBateau {
+  id: string;
+  nom: string;
+  type: string | null;
+  classe: string | null;
+  longueur: number | null;
+  createdAt: string;
+}
+
+/** Resume d'un utilisateur (pour l'admin) */
+export interface ResumeUtilisateur {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  _count: {
+    traces: number;
+    bateaux: number;
+  };
+}
+
 /** Résumé d'une trace (pour la liste) */
 export interface ResumeTrace {
   id: string;

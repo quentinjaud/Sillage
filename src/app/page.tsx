@@ -1,63 +1,29 @@
-export const dynamic = "force-dynamic";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { obtenirSession } from "@/lib/session";
 
-import { prisma } from "@/lib/db";
-import { journalErreur } from "@/lib/journal";
-import FileUpload from "@/components/Upload/FileUpload";
-import TraceList from "@/components/TraceList/TraceList";
-import type { ResumeTrace } from "@/lib/types";
+export default async function PageAccueil() {
+  const session = await obtenirSession();
 
-export default async function HomePage() {
-  let traces: ResumeTrace[] = [];
-  let erreurBD = false;
-
-  try {
-    const resultats = await prisma.trace.findMany({
-      orderBy: [
-        { startedAt: { sort: "desc", nulls: "last" } },
-        { createdAt: "desc" },
-      ],
-      select: {
-        id: true,
-        name: true,
-        filename: true,
-        format: true,
-        source: true,
-        createdAt: true,
-        startedAt: true,
-        distanceNm: true,
-        durationSeconds: true,
-        avgSpeedKn: true,
-        maxSpeedKn: true,
-      },
-    });
-    traces = resultats.map((t) => ({
-      ...t,
-      createdAt: t.createdAt.toISOString(),
-      startedAt: t.startedAt?.toISOString() ?? null,
-    }));
-  } catch (erreur) {
-    journalErreur("HomePage", erreur);
-    erreurBD = true;
+  if (session) {
+    redirect("/traces");
   }
 
   return (
-    <div className="page-container">
-      {erreurBD && (
-        <div className="error-banner">
-          Impossible de se connecter à la base de données. Vérifiez votre
-          connexion réseau et la variable DATABASE_URL.
-        </div>
-      )}
-
-      <section>
-        <h2 className="section-title">Importer une trace</h2>
-        <FileUpload />
-      </section>
-
-      <section>
-        <h2 className="section-title">Mes traces</h2>
-        <TraceList traces={traces} />
-      </section>
+    <div className="landing-hero">
+      <h1 className="landing-title">Navimeter</h1>
+      <p className="landing-subtitle">
+        Le carnet de bord intelligent du navigateur. Analysez vos traces GPS,
+        suivez vos performances et documentez vos navigations.
+      </p>
+      <div className="landing-actions">
+        <Link href="/inscription" className="landing-btn-primary">
+          Creer un compte
+        </Link>
+        <Link href="/connexion" className="landing-btn-secondary">
+          Se connecter
+        </Link>
+      </div>
     </div>
   );
 }

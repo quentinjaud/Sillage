@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { MantineWrapper } from "@/components/MantineProvider";
+import { MenuUtilisateur } from "@/components/MenuUtilisateur";
 import { Footer } from "@/components/Footer";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "./globals.css";
@@ -33,7 +34,7 @@ export default function RootLayout({
             <a href="/" className="app-header-title">
               Navimeter
             </a>
-            <span className="app-header-subtitle">Journal de navigation et analyse de performance</span>
+            <MenuUtilisateur />
           </header>
           <main className="app-main">{children}</main>
           <Footer />

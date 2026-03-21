@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { importerTrace } from "@/lib/services/import-trace";
+import { obtenirSession } from "@/lib/session";
 import { journalErreur } from "@/lib/journal";
 
 export async function POST(requete: NextRequest) {
   try {
+    const session = await obtenirSession();
+    if (!session) {
+      return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+    }
+
     const donnees = await requete.formData();
     const fichier = donnees.get("file") as File | null;
 
@@ -15,7 +21,7 @@ export async function POST(requete: NextRequest) {
       );
     }
 
-    const trace = await importerTrace(fichier);
+    const trace = await importerTrace(fichier, session.user.id);
     return NextResponse.json(trace, { status: 201 });
   } catch (erreur) {
     journalErreur("POST /api/traces", erreur);
@@ -26,7 +32,13 @@ export async function POST(requete: NextRequest) {
 }
 
 export async function GET() {
+  const session = await obtenirSession();
+  if (!session) {
+    return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+  }
+
   const traces = await prisma.trace.findMany({
+    where: { userId: session.user.id },
     orderBy: [
       { startedAt: { sort: "desc", nulls: "last" } },
       { createdAt: "desc" },

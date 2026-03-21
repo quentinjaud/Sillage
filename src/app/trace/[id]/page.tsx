@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { obtenirSession, estAdmin } from "@/lib/session";
+import { redirect } from "next/navigation";
 import TraceMapWrapper from "@/components/Map/TraceMapWrapper";
 import StatsPanel from "@/components/Stats/StatsPanel";
 import SpeedChart from "@/components/Stats/SpeedChart";
@@ -13,6 +15,11 @@ interface PropsPage {
 }
 
 export default async function TraceDetailPage({ params }: PropsPage) {
+  const session = await obtenirSession();
+  if (!session) {
+    redirect("/connexion");
+  }
+
   const { id } = await params;
 
   const trace = await prisma.trace.findUnique({
@@ -25,6 +32,11 @@ export default async function TraceDetailPage({ params }: PropsPage) {
   });
 
   if (!trace) notFound();
+
+  // Verifier ownership (ou admin)
+  if (trace.userId !== session.user.id && !estAdmin(session)) {
+    notFound();
+  }
 
   const pointsSerialises = trace.points.map((p) => ({
     lat: p.lat,
@@ -39,7 +51,7 @@ export default async function TraceDetailPage({ params }: PropsPage) {
   return (
     <div className="trace-detail-layout">
       <div className="trace-header">
-        <Link href="/" className="trace-back-link">
+        <Link href="/traces" className="trace-back-link">
           <ArrowLeft style={{ width: 20, height: 20 }} />
         </Link>
         <h1 className="trace-title">{trace.name}</h1>

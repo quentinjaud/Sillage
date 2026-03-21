@@ -12,7 +12,7 @@ const EXTENSIONS_VALIDES = ["gpx", "kml"];
  * Importe une trace depuis un fichier uploadé :
  * validation → parsing → calcul stats → insertion en base.
  */
-export async function importerTrace(fichier: File) {
+export async function importerTrace(fichier: File, userId: string) {
   // Validation de la taille
   if (fichier.size > TAILLE_MAX_OCTETS) {
     throw new Error("Fichier trop volumineux (max 50 Mo)");
@@ -46,6 +46,7 @@ export async function importerTrace(fichier: File) {
       filename: fichier.name,
       format,
       source,
+      userId,
       startedAt: debutNav,
       distanceNm: statistiques.distanceNm,
       durationSeconds: statistiques.durationSeconds,
