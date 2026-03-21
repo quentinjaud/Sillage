@@ -20,13 +20,12 @@ export function proxy(requete: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verifier la presence du cookie de session (check optimiste)
-  // Better Auth utilise "better-auth.session_token" ou "better-auth-session_token"
-  const tokenSession =
-    requete.cookies.get("better-auth.session_token") ||
-    requete.cookies.get("better-auth-session_token");
+  // Verifier la presence d'un cookie de session Better Auth
+  // Le nom peut varier selon l'environnement (point ou tiret comme separateur)
+  const cookieHeader = requete.headers.get("cookie") || "";
+  const aUnCookieSession = cookieHeader.includes("better-auth");
 
-  if (!tokenSession) {
+  if (!aUnCookieSession) {
     const urlConnexion = new URL("/connexion", requete.url);
     urlConnexion.searchParams.set("retour", pathname);
     return NextResponse.redirect(urlConnexion);
