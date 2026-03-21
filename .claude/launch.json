@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
       "port": 3000
+    },
+    {
+      "name": "prisma-studio",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/.bin/prisma", "studio"],
+      "port": 5555
     }
   ]
 }

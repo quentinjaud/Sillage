@@ -2,16 +2,16 @@
 
 ## MVP (v0.1)
 
-- [ ] Import de fichiers GPX
-- [ ] Import de fichiers KML
-- [ ] Détection automatique de la source (Navionics, SailGrib WR, Weather4D, Navimetrix)
-- [ ] Affichage de la trace sur carte maritime (OSM + OpenSeaMap)
-- [ ] Coloration de la trace par vitesse (bleu → rouge)
-- [ ] Statistiques de base : distance (NM), durée, vitesse moy/max (kn)
-- [ ] Graphique vitesse/temps
-- [ ] Liste des traces importées
-- [ ] Suppression de traces
-- [ ] Déploiement sur Railway
+- [x] Import de fichiers GPX
+- [x] Import de fichiers KML
+- [x] Détection automatique de la source (Navionics, SailGrib WR, Weather4D, Navimetrix, OpenCPN, Garmin, Google Earth, Strava)
+- [x] Affichage de la trace sur carte maritime (OSM + OpenSeaMap)
+- [x] Coloration de la trace par vitesse (bleu → rouge)
+- [x] Statistiques de base : distance (NM), durée, vitesse moy/max (kn)
+- [x] Graphique vitesse/temps
+- [x] Liste des traces importées
+- [x] Suppression de traces
+- [x] Déploiement sur Railway
 
 ## Backlog (futures versions)
 

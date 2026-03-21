@@ -4,16 +4,7 @@ import type { ParsedPoint, ParsedTrace } from "../types";
 import { haversineNm } from "../geo/distance";
 import { bearingDeg } from "../geo/heading";
 import { speedKn } from "../geo/speed";
-
-function detectSource(xmlContent: string): string {
-  const lower = xmlContent.toLowerCase();
-  if (lower.includes("navionics")) return "navionics";
-  if (lower.includes("sailgrib")) return "sailgrib";
-  if (lower.includes("weather4d") || lower.includes("app4nav"))
-    return "weather4d";
-  if (lower.includes("navimetrix")) return "navimetrix";
-  return "unknown";
-}
+import { detectSource } from "./detect-source";
 
 export function parseGpx(
   content: string,
