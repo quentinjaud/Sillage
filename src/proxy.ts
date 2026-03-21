@@ -21,7 +21,10 @@ export function proxy(requete: NextRequest) {
   }
 
   // Verifier la presence du cookie de session (check optimiste)
-  const tokenSession = requete.cookies.get("better-auth.session_token");
+  // Better Auth utilise "better-auth.session_token" ou "better-auth-session_token"
+  const tokenSession =
+    requete.cookies.get("better-auth.session_token") ||
+    requete.cookies.get("better-auth-session_token");
 
   if (!tokenSession) {
     const urlConnexion = new URL("/connexion", requete.url);

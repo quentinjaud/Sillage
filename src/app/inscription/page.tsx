@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signUp } from "@/lib/auth-client";
+import { signUp, useSession } from "@/lib/auth-client";
 
 export default function PageInscription() {
   const routeur = useRouter();
+  const { data: session, isPending } = useSession();
+
+  // Rediriger si deja connecte
+  useEffect(() => {
+    if (session && !isPending) {
+      routeur.push("/traces");
+    }
+  }, [session, isPending, routeur]);
 
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");

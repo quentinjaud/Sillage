@@ -1,19 +1,27 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth-client";
 
 function FormulaireConnexion() {
   const routeur = useRouter();
   const params = useSearchParams();
   const retour = params.get("retour") || "/traces";
+  const { data: session, isPending } = useSession();
 
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const [chargement, setChargement] = useState(false);
+
+  // Rediriger si deja connecte
+  useEffect(() => {
+    if (session && !isPending) {
+      routeur.push(retour);
+    }
+  }, [session, isPending, routeur, retour]);
 
   async function gererSoumission(e: React.FormEvent) {
     e.preventDefault();
@@ -37,6 +45,14 @@ function FormulaireConnexion() {
       setErreur("Une erreur est survenue. Veuillez reessayer.");
       setChargement(false);
     }
+  }
+
+  if (isPending) {
+    return <div>Chargement...</div>;
+  }
+
+  if (session) {
+    return <div>Redirection...</div>;
   }
 
   return (
