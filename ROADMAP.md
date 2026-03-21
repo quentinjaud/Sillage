@@ -66,9 +66,9 @@ User
   - SSR : même pattern `dynamic()` + `ssr: false`
 - [x] Intégrer les algos de gpx.studio (MIT) : smoothing, Ramer-Douglas-Peucker, stats cumulatives
 - [x] Refactoring code existant (francisation, dédoublonnage, service d'import, logger, thème centralisé, validations)
-- [ ] Build + deploy Railway validés
+- [x] Build + deploy Railway validés
 
-**Risques :** Prisma 7 ESM-only peut casser des dépendances. Auth.js v5 peer deps incompatibles Next 16 (overrides ou Better Auth).
+**Risques :** ~~Prisma 7 ESM-only peut casser des dépendances.~~ OK. ~~Auth.js v5 peer deps incompatibles Next 16~~ → Better Auth choisi, compatible.
 
 ## Phase 1 — Auth & Bateaux (v0.2)
 
