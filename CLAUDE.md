@@ -6,7 +6,7 @@ App d'analyse de traces de navigation à voile.
 
 ## Stack
 
-- Next.js 15 + React 19 + TypeScript + Tailwind v4
+- Next.js 15 + React 19 + TypeScript + Mantine + CSS vanilla
 - Prisma 6 + PostgreSQL (Railway)
 - Leaflet + OpenStreetMap + OpenSeaMap (tuiles nautiques)
 - Recharts (graphiques vitesse/temps)
@@ -33,11 +33,12 @@ src/
 
 ## Conventions
 
-- **Langue** : UI en français, code en anglais
+- **Langue** : tout en français (UI, code, commits, logs GitHub)
 - **Unités nautiques** : nœuds (kn), milles nautiques (NM), degrés (°)
-- **Charte graphique** : jaune #F6BC00, bleu #43728B, gris chauds, fond crème #FAF8F5
+- **Charte graphique** : jaune #F6BC00, bleu #43728B, gris chauds, fond crème #FFFDF9 (alignée sur Origami-voilier)
 - **Police** : Atkinson Hyperlegible Next
 - **Carte** : Leaflet côté client uniquement (ssr: false via TraceMapWrapper)
+- **Desktop-first** : l'analyse de traces se fait sur desktop, le responsive est secondaire
 
 ## Commandes
 
