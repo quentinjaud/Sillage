@@ -61,10 +61,10 @@ User
 
 - [x] Migration Next.js 15 → 16 (codemod automatique + adaptations manuelles)
 - [x] Migration Prisma 6 → 7 (ESM-only, driver adapters, prisma.config.ts)
-- [ ] Migration Leaflet → **MapLibre GL JS** (rendu WebGL, gratuit — `react-map-gl/maplibre`)
-  - OpenSeaMap en overlay raster sur fond vectoriel MapLibre
+- [x] Migration Leaflet → **MapLibre GL JS** (rendu WebGL, gratuit — `react-map-gl/maplibre`)
+  - OpenSeaMap en overlay raster sur fond raster MapLibre
   - SSR : même pattern `dynamic()` + `ssr: false`
-- [ ] Intégrer les algos de gpx.studio (MIT) : smoothing, Ramer-Douglas-Peucker, stats cumulatives
+- [x] Intégrer les algos de gpx.studio (MIT) : smoothing, Ramer-Douglas-Peucker, stats cumulatives
 - [x] Refactoring code existant (francisation, dédoublonnage, service d'import, logger, thème centralisé, validations)
 - [ ] Build + deploy Railway validés
 
@@ -146,7 +146,7 @@ User
 
 - **Stack** : Next.js 16 + React 19 + TypeScript + Mantine + CSS vanilla
 - **BDD** : PostgreSQL via Prisma 7 (Railway)
-- **Carte** : MapLibre GL JS + OpenSeaMap (raster overlay)
+- **Carte** : MapLibre GL JS + react-map-gl + OpenSeaMap (raster overlay)
 - **Parsing** : @tmcw/togeojson (GPX/KML), algos gpx.studio (MIT) pour nettoyage/smoothing
 - **Vent** : extensions GPX (priorité) + open-meteo-archive API (fallback, ~25km/1h)
 - **Photos** : Railway Storage Buckets (S3-compatible)

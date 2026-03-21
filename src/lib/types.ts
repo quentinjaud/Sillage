@@ -6,6 +6,10 @@ export interface PointAnalyse {
   speedKn: number | null;
   headingDeg: number | null;
   elevationM: number | null;
+  /** Distance cumulée depuis le début de la trace (NM) — rempli par calculerStatsCumulatives */
+  distanceCumuleeNm?: number;
+  /** Temps écoulé depuis le début de la trace (secondes) — rempli par calculerStatsCumulatives */
+  tempsEcouleSecondes?: number | null;
 }
 
 /** Trace analysee (nom + points) */

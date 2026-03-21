@@ -5,7 +5,7 @@ const dependances = {
   React: packageJson.dependencies.react,
   Prisma: packageJson.dependencies.prisma,
   Mantine: packageJson.dependencies["@mantine/core"],
-  Leaflet: packageJson.dependencies.leaflet,
+  MapLibre: packageJson.dependencies["maplibre-gl"],
   Recharts: packageJson.dependencies.recharts,
 };
 
