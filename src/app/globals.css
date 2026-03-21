@@ -51,6 +51,9 @@ body {
   color: var(--foreground);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Scrollbars — alignées sur Origami */
@@ -106,6 +109,33 @@ body {
 
 .app-main {
   flex: 1;
+}
+
+.app-footer {
+  background: var(--border-light);
+  border-top: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+
+.app-footer-version {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.app-footer-deps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.app-footer-dep {
+  white-space: nowrap;
 }
 
 /* =============================================

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { MantineWrapper } from "@/components/MantineProvider";
+import { Footer } from "@/components/Footer";
 import { ColorSchemeScript } from "@mantine/core";
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
             <span className="app-header-subtitle">Analyse de navigation</span>
           </header>
           <main className="app-main">{children}</main>
+          <Footer />
         </MantineWrapper>
       </body>
     </html>
