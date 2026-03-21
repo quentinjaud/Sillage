@@ -3,6 +3,11 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/db";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    "https://navimeter.up.railway.app",
+    "https://navimeter.origami-aventures.org",
+  ],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
