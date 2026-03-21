@@ -72,10 +72,14 @@ User
 
 ## Phase 1 — Auth & Bateaux (v0.2)
 
-- [ ] Auth utilisateur (Auth.js v5 ou Better Auth — à évaluer en phase 0)
-- [ ] Modèle Bateau : nom, type, classe, longueur
-- [ ] Page "Mes bateaux" : CRUD
-- [ ] Bibliothèque de traces liée au user connecté
+- [x] Auth utilisateur (Better Auth — email/password)
+- [x] Modèle Bateau : nom, classe, longueur
+- [x] Page "Mes bateaux" : CRUD
+- [x] Bibliothèque de traces liée au user connecté
+- [x] Association trace → bateau
+- [x] Espace admin : CRUD utilisateurs, transfert de traces, association bateaux
+- [x] Role admin via ADMIN_EMAIL (env var)
+- [ ] Admin : impersonation d'utilisateurs (voir l'app comme un autre user)
 
 ## Phase 2 — Bibliothèque de traces & Nettoyage (v0.3)
 
