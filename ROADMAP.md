@@ -42,13 +42,18 @@
 - [ ] Gestion par dossiers/événements (regrouper les traces d'une même régate)
 - [ ] Comptes utilisateurs et authentification
 
+### Code et maintenance
+- [ ] Refactorer le code en français (variables, fonctions, commentaires)
+- [ ] Migration vers Prisma 7
+- [ ] Migration vers Next.js 16
+
 ## Notes de collaboration
 
 ### Décisions techniques
-- **Stack** : Next.js 15 + React 19 + TypeScript + Tailwind CSS v4
+- **Stack** : Next.js 15 + React 19 + TypeScript + Mantine + CSS vanilla
 - **BDD** : PostgreSQL via Prisma (Railway)
 - **Carte** : Leaflet + React-Leaflet, couches OSM + OpenSeaMap
 - **Parsing** : @tmcw/togeojson pour GPX et KML
 - **Hébergement** : Railway
 - **Police** : Atkinson Hyperlegible Next
-- **Couleurs** : jaune sunflower #F6BC00, bleu #43728B, gris chauds, blanc crème #FAF8F5
+- **Couleurs** : jaune sunflower #F6BC00, bleu #43728B, gris chauds, blanc crème #FFFDF9 (alignée sur Origami-voilier)
