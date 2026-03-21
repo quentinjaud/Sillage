@@ -27,11 +27,44 @@ interface PropsCarteTrace {
   maxSpeed: number;
 }
 
-/** Convertit une vitesse en couleur (bleu=lent → rouge=rapide) */
-function vitesseVersCouleur(vitesse: number, vitesseMax: number): string {
-  if (vitesseMax <= 0) return "hsl(240, 100%, 50%)";
-  const ratio = Math.min(vitesse / vitesseMax, 1);
-  const teinte = 240 - ratio * 240;
+/** Calcule la moyenne et l'écart-type des vitesses non-null */
+function calculerStatsVitesse(points: PointCarte[]): {
+  moyenne: number;
+  ecartType: number;
+} {
+  const vitesses = points
+    .map((p) => p.speedKn)
+    .filter((v): v is number => v !== null && v > 0);
+  if (vitesses.length === 0) return { moyenne: 0, ecartType: 1 };
+
+  const moyenne = vitesses.reduce((a, b) => a + b, 0) / vitesses.length;
+  if (!isFinite(moyenne)) return { moyenne: 0, ecartType: 1 };
+  const variance =
+    vitesses.reduce((s, v) => s + (v - moyenne) ** 2, 0) / vitesses.length;
+  const ecartType = Math.sqrt(variance) || 1;
+
+  return { moyenne, ecartType };
+}
+
+/**
+ * Convertit une vitesse en couleur (bleu=lent → rouge=rapide).
+ * Échelle relative centrée sur la moyenne ± 2 écarts-types :
+ * les variations locales de vitesse ressortent bien visuellement,
+ * même quand la plage absolue est faible.
+ */
+function vitesseVersCouleur(
+  vitesse: number,
+  moyenne: number,
+  ecartType: number
+): string {
+  const min = Math.max(0, moyenne - 2 * ecartType);
+  const max = moyenne + 2 * ecartType;
+  const plage = max - min;
+  if (!plage || !isFinite(plage) || !isFinite(vitesse)) {
+    return "hsl(240, 100%, 50%)";
+  }
+  const ratio = Math.max(0, Math.min((vitesse - min) / plage, 1));
+  const teinte = Math.round(240 - ratio * 240);
   return `hsl(${teinte}, 100%, 50%)`;
 }
 
@@ -117,8 +150,12 @@ export default function TraceMap({ points, maxSpeed }: PropsCarteTrace) {
     ] as [[number, number], [number, number]];
   }, [points]);
 
+  // Stats de vitesse pour le gradient relatif
+  const statsVitesse = useMemo(() => calculerStatsVitesse(points), [points]);
+
   // Ligne continue unique avec gradient de couleur par vitesse
   const { geojsonLigne, gradientExpression } = useMemo(() => {
+    const { moyenne, ecartType } = statsVitesse;
     const coordinates = points.map((p) => [p.lon, p.lat]);
 
     // Calculer les distances cumulées pour le line-progress
@@ -135,7 +172,7 @@ export default function TraceMap({ points, maxSpeed }: PropsCarteTrace) {
     for (let i = 0; i < points.length; i++) {
       const progress = distances[i] / totalDist;
       const vitesse = points[i].speedKn ?? 0;
-      stops.push(progress, vitesseVersCouleur(vitesse, maxSpeed));
+      stops.push(progress, vitesseVersCouleur(vitesse, moyenne, ecartType));
     }
 
     return {
@@ -154,7 +191,7 @@ export default function TraceMap({ points, maxSpeed }: PropsCarteTrace) {
         ...stops,
       ],
     };
-  }, [points, maxSpeed]);
+  }, [points, statsVitesse]);
 
   // Segments individuels invisibles pour les interactions (popups au clic)
   const geojsonSegments = useMemo(() => {
