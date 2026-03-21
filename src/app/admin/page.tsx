@@ -48,7 +48,7 @@ export default async function PageAdmin() {
 
       <section className="admin-section">
         <h2 className="section-title">Utilisateurs ({utilisateurs.length})</h2>
-        <TableauUtilisateurs utilisateurs={utilisateurs} />
+        <TableauUtilisateurs utilisateurs={utilisateurs} utilisateurConnecteId={session.user.id} />
       </section>
     </div>
   );

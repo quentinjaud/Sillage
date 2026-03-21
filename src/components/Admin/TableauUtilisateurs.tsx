@@ -5,9 +5,10 @@ import type { ResumeUtilisateur } from "@/lib/types";
 
 interface Props {
   utilisateurs: ResumeUtilisateur[];
+  utilisateurConnecteId: string;
 }
 
-export default function TableauUtilisateurs({ utilisateurs }: Props) {
+export default function TableauUtilisateurs({ utilisateurs, utilisateurConnecteId }: Props) {
   const routeur = useRouter();
 
   async function supprimerUtilisateur(id: string, nom: string) {
@@ -64,7 +65,7 @@ export default function TableauUtilisateurs({ utilisateurs }: Props) {
             <td>{u._count.bateaux}</td>
             <td>{new Date(u.createdAt).toLocaleDateString("fr-FR")}</td>
             <td>
-              {u.role !== "admin" && (
+              {u.id !== utilisateurConnecteId && (
                 <button
                   className="admin-actions-btn danger"
                   onClick={() => supprimerUtilisateur(u.id, u.name)}
