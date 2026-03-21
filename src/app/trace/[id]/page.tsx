@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { obtenirSession, estAdmin } from "@/lib/session";
-import { redirect } from "next/navigation";
 import TraceMapWrapper from "@/components/Map/TraceMapWrapper";
 import StatsPanel from "@/components/Stats/StatsPanel";
 import SpeedChart from "@/components/Stats/SpeedChart";
@@ -16,10 +15,6 @@ interface PropsPage {
 
 export default async function TraceDetailPage({ params }: PropsPage) {
   const session = await obtenirSession();
-  if (!session) {
-    redirect("/connexion");
-  }
-
   const { id } = await params;
 
   const trace = await prisma.trace.findUnique({
@@ -33,8 +28,13 @@ export default async function TraceDetailPage({ params }: PropsPage) {
 
   if (!trace) notFound();
 
-  // Verifier ownership (ou admin)
-  if (trace.userId !== session.user.id && !estAdmin(session)) {
+  // Verifier ownership (ou admin) — si pas de session (erreur DB), on bloque
+  if (session) {
+    if (trace.userId !== session.user.id && !estAdmin(session)) {
+      notFound();
+    }
+  } else {
+    // Pas de session disponible — le proxy a laisse passer mais on ne peut pas verifier ownership
     notFound();
   }
 

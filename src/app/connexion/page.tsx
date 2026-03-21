@@ -16,10 +16,10 @@ function FormulaireConnexion() {
   const [erreur, setErreur] = useState("");
   const [chargement, setChargement] = useState(false);
 
-  // Rediriger si deja connecte
+  // Rediriger si deja connecte (navigation directe, pas window.location pour eviter boucle)
   useEffect(() => {
     if (session && !isPending) {
-      routeur.push(retour);
+      routeur.replace(retour);
     }
   }, [session, isPending, routeur, retour]);
 
@@ -47,13 +47,8 @@ function FormulaireConnexion() {
     }
   }
 
-  if (isPending) {
-    return <div>Chargement...</div>;
-  }
-
-  if (session) {
-    return <div>Redirection...</div>;
-  }
+  // Ne pas afficher "Redirection..." indefiniment — toujours montrer le formulaire
+  // Le useEffect fera le redirect si la session est valide
 
   return (
     <form onSubmit={gererSoumission} className="auth-form">
