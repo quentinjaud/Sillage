@@ -11,7 +11,6 @@ interface Props {
 
 export default function FormulaireBateau({ bateau, onTermine, onAnnuler }: Props) {
   const [nom, setNom] = useState(bateau?.nom ?? "");
-  const [type, setType] = useState(bateau?.type ?? "");
   const [classe, setClasse] = useState(bateau?.classe ?? "");
   const [longueur, setLongueur] = useState(bateau?.longueur?.toString() ?? "");
   const [chargement, setChargement] = useState(false);
@@ -33,7 +32,6 @@ export default function FormulaireBateau({ bateau, onTermine, onAnnuler }: Props
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nom,
-          type: type || null,
           classe: classe || null,
           longueur: longueur ? parseFloat(longueur) : null,
         }),
@@ -71,20 +69,6 @@ export default function FormulaireBateau({ bateau, onTermine, onAnnuler }: Props
           onChange={(e) => setNom(e.target.value)}
           required
           placeholder="Ex: Origami"
-        />
-      </div>
-
-      <div className="bateau-form-field">
-        <label htmlFor="type" className="bateau-form-label">
-          Type
-        </label>
-        <input
-          id="type"
-          type="text"
-          className="bateau-form-input"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          placeholder="Ex: Voilier, Deriveur, Catamaran"
         />
       </div>
 

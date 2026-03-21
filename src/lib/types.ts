@@ -54,7 +54,6 @@ export interface TraceAvecPoints {
 export interface ResumeBateau {
   id: string;
   nom: string;
-  type: string | null;
   classe: string | null;
   longueur: number | null;
   createdAt: string;

@@ -25,7 +25,7 @@ export async function POST(requete: NextRequest) {
     }
 
     const corps = await requete.json();
-    const { nom, type, classe, longueur } = corps;
+    const { nom, classe, longueur } = corps;
 
     if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
       return NextResponse.json(
@@ -37,7 +37,6 @@ export async function POST(requete: NextRequest) {
     const bateau = await prisma.bateau.create({
       data: {
         nom: nom.trim(),
-        type: type?.trim() || null,
         classe: classe?.trim() || null,
         longueur: longueur ? Number(longueur) : null,
         userId: session.user.id,

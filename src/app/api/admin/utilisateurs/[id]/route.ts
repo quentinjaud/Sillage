@@ -22,7 +22,7 @@ export async function GET(
         orderBy: { createdAt: "desc" },
       },
       bateaux: {
-        select: { id: true, nom: true, type: true, classe: true },
+        select: { id: true, nom: true, classe: true },
         orderBy: { createdAt: "desc" },
       },
     },

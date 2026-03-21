@@ -38,7 +38,6 @@ export default function TransfertTrace({ traces, utilisateurs, bateaux }: Props)
   const bateauxFormates = bateaux.map((b) => ({
     id: b.id,
     nom: `${b.nom} (${b.user.name})`,
-    type: null,
     classe: null,
     longueur: null,
     createdAt: "",

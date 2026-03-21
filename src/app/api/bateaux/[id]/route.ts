@@ -40,7 +40,7 @@ export async function PUT(
     }
 
     const corps = await requete.json();
-    const { nom, type, classe, longueur } = corps;
+    const { nom, classe, longueur } = corps;
 
     if (!nom || typeof nom !== "string" || nom.trim().length === 0) {
       return NextResponse.json(
@@ -53,7 +53,6 @@ export async function PUT(
       where: { id },
       data: {
         nom: nom.trim(),
-        type: type?.trim() || null,
         classe: classe?.trim() || null,
         longueur: longueur ? Number(longueur) : null,
       },

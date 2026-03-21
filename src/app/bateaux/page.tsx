@@ -21,7 +21,6 @@ export default async function PageBateaux() {
       bateaux = resultats.map((b) => ({
         id: b.id,
         nom: b.nom,
-        type: b.type,
         classe: b.classe,
         longueur: b.longueur,
         createdAt: b.createdAt.toISOString(),

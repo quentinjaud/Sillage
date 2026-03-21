@@ -67,7 +67,6 @@ model Verification {
 model Bateau {
   id        String   @id @default(cuid())
   nom       String
-  type      String?
   classe    String?
   longueur  Float?
   userId    String

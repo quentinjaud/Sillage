@@ -67,7 +67,6 @@ export default function ListeBateaux({ bateaux: bateauxInitiaux }: Props) {
               <div className="bateau-card-content">
                 <div className="bateau-card-nom">{bateau.nom}</div>
                 <div className="bateau-card-meta">
-                  {bateau.type && <span>{bateau.type}</span>}
                   {bateau.classe && <span>{bateau.classe}</span>}
                   {bateau.longueur && <span>{bateau.longueur} m</span>}
                 </div>

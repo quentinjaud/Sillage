@@ -56,7 +56,6 @@ export default async function PageTraces() {
       bateaux = resultatsBateaux.map((b) => ({
         id: b.id,
         nom: b.nom,
-        type: b.type,
         classe: b.classe,
         longueur: b.longueur,
         createdAt: b.createdAt.toISOString(),
