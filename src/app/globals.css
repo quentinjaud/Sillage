@@ -1,5 +1,4 @@
 @import "@mantine/core/styles.css";
-@import "leaflet/dist/leaflet.css";
 
 :root {
   /* Neutres — alignés sur Origami-voilier */
@@ -503,6 +502,36 @@ body {
 .map-popup-coords {
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+.map-layer-control {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  font-size: 0.75rem;
+  color: var(--foreground);
+}
+
+.map-layer-radio,
+.map-layer-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.map-layer-separator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2px 0;
 }
 
 /* =============================================
