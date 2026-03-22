@@ -160,6 +160,16 @@ User
 
 ---
 
+## Refactorings en attente
+
+- [ ] Extraire `creerStyleCarte` en module partage (`src/lib/geo/style-carte.ts`) — duplique entre TraceMap et CarteNettoyage
+- [ ] Constantes layer IDs MapLibre (`"osm"`, `"satellite"`, `"openseamap"`) — strings repetees dans TraceMap
+- [ ] Generaliser `TitreEditable` avec callback `onSave` — reutilisable pour trace et navigation
+- [ ] Extraire SVG marqueur bateau en composant (`MarqueurBateau.tsx`) — quand un second usage apparait
+- [ ] Timeline : cleanup listeners `mousemove`/`mouseup` sur unmount (guard `useRef`)
+
+---
+
 ## Décisions techniques
 
 - **Stack** : Next.js 16 + React 19 + TypeScript + Mantine + CSS vanilla
