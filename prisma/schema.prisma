@@ -22,6 +22,9 @@ model User {
   accounts      Account[]
   traces        Trace[]
   bateaux       Bateau[]
+  dossiers      Dossier[]
+  aventures     Aventure[]
+  navigations   Navigation[]
 }
 
 model Session {
@@ -94,7 +97,9 @@ model Trace {
   user            User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   bateauId        String?
   bateau          Bateau?      @relation(fields: [bateauId], references: [id], onDelete: SetNull)
-  points          TrackPoint[]
+  polylineSimplifiee Json?
+  points             TrackPoint[]
+  navigation         Navigation?
 
   @@index([userId])
   @@index([bateauId])
@@ -115,4 +120,62 @@ model TrackPoint {
 
   @@index([traceId])
   @@index([traceId, isExcluded])
+}
+
+// === Journal de bord ===
+
+enum TypeNavigation {
+  SOLO
+  REGATE
+}
+
+model Dossier {
+  id          String       @id @default(cuid())
+  nom         String
+  description String?
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aventures   Aventure[]
+  navigations Navigation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])
+}
+
+model Aventure {
+  id          String       @id @default(cuid())
+  nom         String
+  description String?
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dossierId   String
+  dossier     Dossier      @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  navigations Navigation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([dossierId])
+  @@index([userId])
+}
+
+model Navigation {
+  id         String         @id @default(cuid())
+  nom        String
+  date       DateTime
+  type       TypeNavigation @default(SOLO)
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dossierId  String
+  dossier    Dossier        @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  aventureId String?
+  aventure   Aventure?      @relation(fields: [aventureId], references: [id], onDelete: Cascade)
+  traceId    String?        @unique
+  trace      Trace?         @relation(fields: [traceId], references: [id], onDelete: SetNull)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([dossierId])
+  @@index([aventureId])
+  @@index([userId])
 }
