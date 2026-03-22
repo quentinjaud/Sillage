@@ -1914,3 +1914,37 @@ body:has(.nettoyage-layout) .app-main {
 .upload-errors {
   margin-top: 8px;
 }
+
+/* =============================================
+   APERCU TRACE (mini-carte N&B)
+   ============================================= */
+
+.apercu-trace {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: #333;
+}
+
+.apercu-trace-vide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+.apercu-trace-tuile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  filter: grayscale(1) contrast(0.7);
+  pointer-events: none;
+}
+
+.apercu-trace-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
