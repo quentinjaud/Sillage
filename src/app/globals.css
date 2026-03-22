@@ -2292,6 +2292,16 @@ body:has(.nettoyage-layout) .app-main {
   transition: box-shadow 0.15s;
 }
 
+.chart-slider-thumb::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 .chart-slider-thumb:hover {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.25);
 }
@@ -2424,7 +2434,7 @@ body:has(.nettoyage-layout) .app-main {
   gap: 4px;
   padding: 6px 12px;
   border-radius: 20px;
-  background: rgba(246, 188, 0, 0.25);
+  background: var(--accent-yellow);
   color: var(--text);
   font-size: 12px;
   font-weight: 500;
@@ -2434,7 +2444,7 @@ body:has(.nettoyage-layout) .app-main {
 }
 
 .navigation-retour:hover {
-  background: rgba(246, 188, 0, 0.45);
+  background: var(--accent-yellow-dark);
 }
 
 /* Decaler les boutons carte quand le bouton retour est present */
@@ -2494,4 +2504,79 @@ body:has(.nettoyage-layout) .app-main {
 
 .badge-type-cliquable:hover {
   opacity: 0.8;
+}
+
+/* ==========================================================================
+   TACTILE — Adaptations pour appareils sans hover (tablettes, mobiles)
+   ========================================================================== */
+@media (hover: none) {
+  /* Actions cartes journal : toujours visibles sur tactile */
+  .carte-dossier-actions,
+  .carte-aventure-actions,
+  .carte-navigation-actions {
+    opacity: 1;
+  }
+
+  /* Boutons contextuels : zones tactiles 44px minimum */
+  .btn-menu-contextuel {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Resize handle : zone de touch elargie via pseudo-element */
+  .graphique-resize-handle {
+    position: relative;
+  }
+  .graphique-resize-handle::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+
+  /* Filtres/tri traces : zones cliquables agrandies */
+  .trace-filter-search {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  .trace-filter-select {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  .trace-filter-tri-btn {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  .trace-list-clean-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Graphique + timeline colles en bas sur tablette (pas de padding, pas de radius) */
+  .trace-vue-graphique {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 12px 0;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Timeline : curseur tactile 44px */
+  .timeline-barre {
+    padding: 10px 0;
+  }
+  .timeline-curseur {
+    width: 20px;
+    height: 20px;
+  }
 }

@@ -229,28 +229,31 @@ export default function TraceChart({
     [donneesGraphique, tempsDebut, duree]
   );
 
-  // Drag du thumb slider
+  // Drag du thumb slider — logique partagee mouse/touch
+  const deplacerThumb = useCallback(
+    (clientX: number) => {
+      if (!onClickPoint) return;
+      const conteneur = conteneurRef.current;
+      if (!conteneur) return;
+      const rect = conteneur.getBoundingClientRect();
+      const s = sliderStyle ?? { left: 30, right: 5 };
+      const zoneGauche = rect.left + s.left;
+      const zoneDroite = rect.right - s.right;
+      const largeurZone = zoneDroite - zoneGauche;
+      const ratio = Math.max(0, Math.min(1, (clientX - zoneGauche) / largeurZone));
+      const idx = trouverPointParRatio(ratio);
+      if (idx != null) onClickPoint(idx);
+    },
+    [onClickPoint, trouverPointParRatio, sliderStyle]
+  );
+
   const handleThumbMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (!onClickPoint) return;
       e.preventDefault();
       e.stopPropagation();
 
-      const conteneur = conteneurRef.current;
-      if (!conteneur) return;
-
-      const deplacer = (clientX: number) => {
-        const rect = conteneur.getBoundingClientRect();
-        const s = sliderStyle ?? { left: 30, right: 5 };
-        const zoneGauche = rect.left + s.left;
-        const zoneDroite = rect.right - s.right;
-        const largeurZone = zoneDroite - zoneGauche;
-        const ratio = Math.max(0, Math.min(1, (clientX - zoneGauche) / largeurZone));
-        const idx = trouverPointParRatio(ratio);
-        if (idx != null) onClickPoint(idx);
-      };
-
-      const handleMove = (ev: MouseEvent) => deplacer(ev.clientX);
+      const handleMove = (ev: MouseEvent) => deplacerThumb(ev.clientX);
       const handleUp = () => {
         document.removeEventListener("mousemove", handleMove);
         document.removeEventListener("mouseup", handleUp);
@@ -258,7 +261,47 @@ export default function TraceChart({
       document.addEventListener("mousemove", handleMove);
       document.addEventListener("mouseup", handleUp);
     },
-    [onClickPoint, trouverPointParRatio, sliderStyle]
+    [onClickPoint, deplacerThumb]
+  );
+
+  const handleThumbTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (!onClickPoint) return;
+      e.stopPropagation();
+
+      const handleMove = (ev: TouchEvent) => {
+        ev.preventDefault();
+        deplacerThumb(ev.touches[0].clientX);
+      };
+      const handleEnd = () => {
+        document.removeEventListener("touchmove", handleMove);
+        document.removeEventListener("touchend", handleEnd);
+      };
+      document.addEventListener("touchmove", handleMove, { passive: false });
+      document.addEventListener("touchend", handleEnd);
+    },
+    [onClickPoint, deplacerThumb]
+  );
+
+  // Tap-to-hover sur tactile : un tap sur le graphique simule le survol
+  const handleTouchChart = useCallback(
+    (e: React.TouchEvent) => {
+      const conteneur = conteneurRef.current;
+      if (!conteneur) return;
+      const touch = e.touches[0];
+      const rect = conteneur.getBoundingClientRect();
+      const s = sliderStyle ?? { left: 30, right: 5 };
+      const zoneGauche = rect.left + s.left;
+      const zoneDroite = rect.right - s.right;
+      const largeurZone = zoneDroite - zoneGauche;
+      const ratio = Math.max(0, Math.min(1, (touch.clientX - zoneGauche) / largeurZone));
+      const idx = trouverPointParRatio(ratio);
+      if (idx != null) {
+        dernierPointSurvoleRef.current = idx;
+        onHoverPoint(idx);
+      }
+    },
+    [onHoverPoint, trouverPointParRatio, sliderStyle]
   );
 
   if (donneesGraphique.length < 2) {
@@ -273,7 +316,7 @@ export default function TraceChart({
   const stroke = `url(#${strokeId})`;
 
   return (
-    <div className="chart-container" ref={conteneurRef}>
+    <div className="chart-container" ref={conteneurRef} onTouchStart={handleTouchChart}>
       <h3 className="chart-title">{config.titre}</h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -360,6 +403,7 @@ export default function TraceChart({
               className="chart-slider-thumb"
               style={{ left: `${positionThumbFixe}%` }}
               onMouseDown={handleThumbMouseDown}
+              onTouchStart={handleThumbTouchStart}
             />
           </>
         )}
