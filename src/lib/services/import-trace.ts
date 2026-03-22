@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { analyserFichierTrace } from "@/lib/parsers";
 import { calculerStats } from "@/lib/geo/stats";
 import { detecterAberrants } from "@/lib/geo/detection-aberrants";
+import { simplifierRDP } from "@/lib/geo/simplification";
 
 /** Taille maximale autorisée pour un fichier (50 Mo) */
 const TAILLE_MAX_OCTETS = 50 * 1024 * 1024;
@@ -46,6 +47,11 @@ export async function importerTrace(fichier: File, userId: string) {
   );
   const debutNav = analysee.points.find((p) => p.timestamp)?.timestamp ?? null;
 
+  // Polyline simplifiee pour les mini-cartes d'apercu (50-100 points)
+  const pointsNonExclus = analysee.points.filter((_, i) => !indexAberrants.has(i));
+  const pointsSimplifies = simplifierRDP(pointsNonExclus, 0.005); // ~9m tolerance en NM
+  const polylineSimplifiee = pointsSimplifies.map((p) => [p.lon, p.lat]);
+
   // Insertion en base
   const trace = await prisma.trace.create({
     data: {
@@ -59,6 +65,7 @@ export async function importerTrace(fichier: File, userId: string) {
       durationSeconds: statistiques.durationSeconds,
       avgSpeedKn: statistiques.avgSpeedKn,
       maxSpeedKn: statistiques.maxSpeedKn,
+      polylineSimplifiee,
       points: {
         create: analysee.points.map((p, i) => ({
           lat: p.lat,

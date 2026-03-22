@@ -92,18 +92,31 @@ User
 - [ ] Recalcul automatique des stats après nettoyage
 - [ ] Export trace nettoyée (GPX propre)
 
-## Phase 3 — Journal : dossiers & navigations (v0.4)
+## Phase 3a — Journal : dossiers & navigations (v0.4)
 
-- [ ] Page journal `/journal` : arborescence dossiers + navigations
-- [ ] Filtrage : par bateau, par type (solo/régate), par date, par dossier
-- [ ] CRUD dossiers (un dossier = une "aventure" partageable)
-- [ ] Créer une navigation : nom, date, ajouter 1+ trace depuis la bibliothèque
-- [ ] Vue navigation : carte + timeline + replay animé (play/pause/vitesse)
-- [ ] Curseur synchronisé graphique ↔ carte
-- [ ] Entrées journal : notes texte + photos géolocalisées
-- [ ] Mode édition post-nav
+- [x] Page journal `/journal` : cartes depliables (approche hybride)
+- [x] Hierarchie Dossier → Aventure (optionnelle) → Navigation
+- [x] CRUD dossiers, aventures, navigations
+- [x] Association navigation → trace (1:1)
+- [x] Panneau d'apercu lateral (mini-carte + stats au survol)
+- [x] Mini-carte N&B (tuiles OSM + SVG, sans MapLibre)
+- [x] Filtrage par bateau, type (solo/regate) dans les dossiers deplies
+- [x] Header reorganise : Journal en nav principale, Traces/Bateaux dans dropdown user
+- [x] Polyline simplifiee calculee a l'import (RDP)
 
-**Storage photos :** Railway Storage Buckets (S3-compatible, $0.015/GB/mois, egress gratuit)
+## Phase 3b — Vue navigation immersive (v0.4.x)
+
+- [ ] Route `/navigation/[id]` : vue immersive distincte de `/trace/[id]`
+  - `/trace/[id]` = vue brute, nettoyage, edition GPS (depuis "Mes traces")
+  - `/navigation/[id]` = meme carte/graphique + journalisation (depuis le journal)
+- [ ] Vue navigation : carte + timeline + replay anime (play/pause/vitesse)
+- [ ] Curseur synchronise graphique ↔ carte
+- [ ] Mode edition post-nav
+
+## Phase 3c — Entrees journal (v0.4.x)
+
+- [ ] Entrees journal : notes texte + photos geolocalisees
+- [ ] Storage photos : Railway Storage Buckets (S3-compatible)
 
 ## Phase 4 — Performance mono-trace (v0.5)
 

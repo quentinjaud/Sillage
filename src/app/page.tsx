@@ -2,11 +2,13 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { obtenirSession } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 export default async function PageAccueil() {
   const session = await obtenirSession();
 
   if (session) {
-    redirect("/traces");
+    redirect("/journal");
   }
 
   return (

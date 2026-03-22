@@ -787,11 +787,6 @@ body {
   font-size: 0.875rem;
 }
 
-.app-header-user-name {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-}
-
 .app-header-user-links {
   display: flex;
   align-items: center;
@@ -812,21 +807,18 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-.app-header-logout-btn {
-  color: rgba(255, 255, 255, 0.8);
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 5px 12px;
-  border-radius: var(--radius-md);
-  font-size: 0.8125rem;
+.app-header-user-menu-btn {
+  color: white;
   font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
 }
 
-.app-header-logout-btn:hover {
-  color: white;
-  border-color: rgba(255, 255, 255, 0.6);
+.app-header-user-menu-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -1921,4 +1913,190 @@ body:has(.nettoyage-layout) .app-main {
 
 .upload-errors {
   margin-top: 8px;
+}
+
+/* =============================================
+   APERCU TRACE (mini-carte N&B)
+   ============================================= */
+
+.apercu-trace {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: #333;
+}
+
+.apercu-trace-vide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+.apercu-trace-tuile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  filter: grayscale(1) contrast(0.7);
+  pointer-events: none;
+}
+
+.apercu-trace-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* =============================================
+   PANNEAU APERCU (sidebar journal)
+   ============================================= */
+
+.panneau-apercu {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: opacity 0.15s ease;
+}
+
+.panneau-apercu-vide {
+  border: none;
+  background: none;
+}
+
+.panneau-apercu-no-trace {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border-light);
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.panneau-apercu-infos {
+  padding: 16px;
+}
+
+.panneau-apercu-titre {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--foreground);
+}
+
+.panneau-apercu-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panneau-apercu-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+}
+
+.panneau-apercu-stat dt {
+  color: var(--text-secondary);
+}
+
+.panneau-apercu-stat dd {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* =============================================
+   JOURNAL DE BORD
+   ============================================= */
+
+/* JOURNAL LAYOUT */
+.journal-layout { display: flex; gap: 24px; max-width: 72rem; margin: 0 auto; padding: 24px; }
+.journal-contenu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+/* BARRE ACTIONS */
+.barre-actions-journal { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.barre-actions-filtres { display: flex; gap: 8px; margin-left: auto; }
+
+/* CARTE DOSSIER — yellow left border */
+.carte-dossier { background: white; border: 1px solid var(--border); border-left: 4px solid var(--accent-yellow); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.15s; }
+.carte-dossier:hover { border-color: var(--accent); border-left-color: var(--accent-yellow); }
+.carte-dossier-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; gap: 16px; }
+.carte-dossier-info { display: flex; align-items: flex-start; gap: 12px; flex: 1; min-width: 0; }
+.carte-dossier-chevron { color: var(--text-secondary); font-size: 0.875rem; flex-shrink: 0; margin-top: 2px; }
+.carte-dossier-nom { font-size: 1rem; font-weight: 600; margin: 0; }
+.carte-dossier-description { font-size: 0.8125rem; color: var(--text-secondary); margin-top: 2px; }
+.carte-dossier-compteurs { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; display: block; }
+.carte-dossier-contenu { padding: 0 16px 16px 24px; animation: deplier 0.15s ease; }
+.carte-dossier-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.carte-dossier:hover .carte-dossier-actions { opacity: 1; }
+
+/* CARTE AVENTURE — blue left border */
+.carte-aventure { background: white; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius-md); margin-bottom: 8px; }
+.carte-aventure-header { display: flex; align-items: center; justify-content: space-between; padding: 12px; cursor: pointer; gap: 12px; }
+.carte-aventure-info { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.carte-aventure-chevron { color: var(--text-secondary); font-size: 0.75rem; }
+.carte-aventure-nom { font-weight: 500; font-size: 0.9375rem; }
+.carte-aventure-count { font-size: 0.75rem; color: var(--text-light); }
+.carte-aventure-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.carte-aventure:hover > .carte-aventure-header > .carte-aventure-actions { opacity: 1; }
+.carte-aventure-contenu { padding: 4px 12px 12px 24px; display: flex; flex-direction: column; gap: 6px; animation: deplier 0.15s ease; }
+.carte-aventure-vide { font-size: 0.8125rem; color: var(--text-light); padding: 8px 0; }
+
+/* CARTE NAVIGATION */
+.carte-navigation { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color 0.15s; gap: 12px; }
+.carte-navigation-cliquable { cursor: pointer; }
+.carte-navigation:hover { border-color: var(--accent); }
+.carte-navigation-contenu { flex: 1; min-width: 0; }
+.carte-navigation-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.carte-navigation-nom { font-weight: 500; font-size: 0.875rem; }
+.carte-navigation-date { font-size: 0.75rem; color: var(--text-secondary); }
+.carte-navigation-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.carte-navigation-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.carte-navigation:hover .carte-navigation-actions { opacity: 1; }
+
+/* BADGES */
+.badge-type { font-size: 0.6875rem; padding: 2px 6px; border-radius: var(--radius-sm); text-transform: uppercase; letter-spacing: 0.03em; font-weight: 500; }
+.badge-type-solo { background: var(--border); color: var(--text-secondary); }
+.badge-type-regate { background: var(--accent-yellow-light); color: var(--accent-yellow-dark); }
+.badge-bateau { font-size: 0.6875rem; padding: 2px 6px; border-radius: var(--radius-sm); background: var(--accent-light); color: var(--accent); }
+.badge-trace { font-size: 0.6875rem; color: var(--text-secondary); }
+.badge-trace-vide { font-size: 0.6875rem; color: var(--text-light); font-style: italic; }
+
+/* CONTENU DOSSIER */
+.contenu-dossier { display: flex; flex-direction: column; gap: 8px; }
+.contenu-dossier-actions { display: flex; gap: 8px; margin-bottom: 4px; }
+.contenu-dossier-vide { font-size: 0.8125rem; color: var(--text-light); text-align: center; padding: 16px 0; }
+.contenu-dossier-section-titre { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-top: 8px; }
+
+/* BUTTONS */
+.btn-principal { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.btn-principal:hover { background: var(--accent-dark); }
+.btn-secondaire { background: none; color: var(--accent); border: 1px solid var(--border); padding: 6px 12px; border-radius: var(--radius-md); font-size: 0.8125rem; cursor: pointer; font-family: inherit; transition: border-color 0.15s; }
+.btn-secondaire:hover { border-color: var(--accent); }
+.btn-menu-contextuel { background: none; border: none; color: var(--text-light); cursor: pointer; padding: 4px; font-size: 0.875rem; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; font-family: inherit; }
+.btn-menu-contextuel:hover { color: var(--accent); background: var(--accent-light); }
+.btn-menu-contextuel-danger:hover { color: var(--danger); background: #fef2f2; }
+
+/* MODALE */
+.modale-form { display: flex; flex-direction: column; gap: 16px; }
+.modale-form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+/* JOURNAL EMPTY STATE */
+.journal-vide { text-align: center; padding: 64px 0; }
+.journal-vide-icone { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+.journal-vide-texte { color: var(--text-secondary); font-size: 0.9375rem; }
+.journal-filtre-note { font-size: 0.75rem; color: var(--text-light); text-align: center; }
+
+/* ANIMATION */
+@keyframes deplier {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

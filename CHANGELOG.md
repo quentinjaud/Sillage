@@ -1,5 +1,40 @@
 # Navimeter — Changelog
 
+## v0.4.0 — Phase 3a : Journal — dossiers & navigations (2026-03-22)
+
+### Journal de bord
+- Page `/journal` : organisation en dossiers, aventures et navigations
+- Hierarchie Dossier → Aventure (optionnelle) → Navigation
+- CRUD complet avec modales (creer, editer, supprimer)
+- Association navigation → trace depuis la bibliotheque
+- Panneau d'apercu lateral : mini-carte N&B + statistiques au survol
+- Filtrage par bateau et type (solo/regate) dans les dossiers deplies
+
+### Mini-carte d'apercu
+- Tuiles OSM raster en noir & blanc (CSS grayscale)
+- Trace coloree en SVG overlay (projection Web Mercator)
+- Polyline simplifiee calculee a l'import (Ramer-Douglas-Peucker, 50-100 points)
+- Superposition multi-traces pour les aventures
+
+### Navigation
+- Header reorganise : "Journal" en lien principal, "Mes traces" et "Mes bateaux" dans le dropdown utilisateur
+- Redirection accueil vers `/journal` (au lieu de `/traces`)
+
+### Schema
+- Nouveaux modeles : Dossier, Aventure, Navigation (avec TypeNavigation enum)
+- Champ `polylineSimplifiee` sur Trace
+
+### API
+- `GET/POST /api/journal/dossiers` — liste et creation de dossiers
+- `PATCH/DELETE /api/journal/dossiers/[id]` — modification et suppression
+- `GET /api/journal/dossiers/[id]/contenu` — contenu deplie
+- `POST /api/journal/dossiers/[dossierId]/aventures` — creation aventure
+- `PATCH/DELETE /api/journal/aventures/[id]` — modification et suppression
+- `POST /api/journal/navigations` — creation navigation
+- `PATCH/DELETE /api/journal/navigations/[id]` — modification et suppression
+
+---
+
 ## v0.3.0 — Phase 2 : Bibliothèque de traces & Nettoyage (2026-03-22)
 
 ### Nettoyage de traces

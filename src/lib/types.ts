@@ -103,3 +103,49 @@ export interface ResumeTrace {
   bateauId: string | null;
   bateau: { id: string; nom: string } | null;
 }
+
+// === Journal de bord ===
+
+export interface ResumeDossier {
+  id: string;
+  nom: string;
+  description: string | null;
+  nbAventures: number;
+  nbNavigations: number;
+  createdAt: string;
+}
+
+export interface ResumeAventure {
+  id: string;
+  nom: string;
+  description: string | null;
+  navigations: ResumeNavigation[];
+  createdAt: string;
+}
+
+export interface ResumeTraceNavigation {
+  id: string;
+  name: string;
+  bateau: { id: string; nom: string } | null;
+  distanceNm: number | null;
+  durationSeconds: number | null;
+  avgSpeedKn: number | null;
+  maxSpeedKn: number | null;
+  polylineSimplifiee: [number, number][] | null;
+}
+
+export interface ResumeNavigation {
+  id: string;
+  nom: string;
+  date: string;
+  type: "SOLO" | "REGATE";
+  dossierId: string;
+  aventureId: string | null;
+  trace: ResumeTraceNavigation | null;
+  createdAt: string;
+}
+
+export interface ContenuDossier {
+  aventures: ResumeAventure[];
+  navigationsOrphelines: ResumeNavigation[];
+}
