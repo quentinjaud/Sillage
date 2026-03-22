@@ -51,24 +51,22 @@ export default function Timeline({
     [points]
   );
 
-  const tempsDebut = pointsTemporels[0]?.timestamp ?? 0;
-  const tempsFin =
-    pointsTemporels[pointsTemporels.length - 1]?.timestamp ?? 0;
-  const duree = tempsFin - tempsDebut || 1;
+  const { tempsDebut, duree } = useMemo(() => {
+    const debut = pointsTemporels[0]?.timestamp ?? 0;
+    const fin = pointsTemporels[pointsTemporels.length - 1]?.timestamp ?? 0;
+    return { tempsDebut: debut, duree: fin - debut || 1 };
+  }, [pointsTemporels]);
 
-  const positionCurseur = useMemo(() => {
-    if (pointActifIndex == null || pointsTemporels.length === 0) return null;
+  const { positionCurseur, heurePointActif } = useMemo(() => {
+    if (pointActifIndex == null || pointsTemporels.length === 0)
+      return { positionCurseur: null, heurePointActif: null };
     const pt = pointsTemporels.find((p) => p.pointIndex === pointActifIndex);
-    if (!pt) return null;
-    return ((pt.timestamp - tempsDebut) / duree) * 100;
+    if (!pt) return { positionCurseur: null, heurePointActif: null };
+    return {
+      positionCurseur: ((pt.timestamp - tempsDebut) / duree) * 100,
+      heurePointActif: format(new Date(pt.timestamp), "HH:mm:ss"),
+    };
   }, [pointActifIndex, pointsTemporels, tempsDebut, duree]);
-
-  const heurePointActif = useMemo(() => {
-    if (pointActifIndex == null) return null;
-    const pt = pointsTemporels.find((p) => p.pointIndex === pointActifIndex);
-    if (!pt) return null;
-    return format(new Date(pt.timestamp), "HH:mm:ss");
-  }, [pointActifIndex, pointsTemporels]);
 
   const calculerIndexDepuisPosition = useCallback(
     (clientX: number) => {

@@ -16,27 +16,13 @@ import {
 import { format } from "date-fns";
 import { COULEURS } from "@/lib/theme";
 import type { PointNettoyage } from "@/lib/types";
+import { sousechantillonner } from "@/lib/utilitaires";
 
 interface PropsGraphiqueNettoyage {
   points: PointNettoyage[];
   pointSurvole: number | null;
   onHoverPoint: (pointIndex: number | null) => void;
   onSelectRange: (debut: number, fin: number) => void;
-}
-
-/** Sous-échantillonne un tableau pour le rendu graphique */
-function sousechantillonner<T>(donnees: T[], pointsMax: number): T[] {
-  if (donnees.length <= pointsMax) return donnees;
-  const pas = donnees.length / pointsMax;
-  const resultat: T[] = [];
-  for (let i = 0; i < pointsMax; i++) {
-    resultat.push(donnees[Math.round(i * pas)]);
-  }
-  const dernierIndex = donnees.length - 1;
-  if (Math.round((pointsMax - 1) * pas) !== dernierIndex) {
-    resultat.push(donnees[dernierIndex]);
-  }
-  return resultat;
 }
 
 interface DonneeGraphique {

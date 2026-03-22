@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TraceMapWrapper from "@/components/Map/TraceMapWrapper";
 import TraceChart from "@/components/Stats/TraceChart";
 import Timeline from "@/components/Stats/Timeline";
 import PanneauStats from "@/components/Stats/PanneauStats";
 import GraphiqueRedimensionnable from "@/components/Stats/GraphiqueRedimensionnable";
-import type { PointCarte, DonneeGraphee } from "@/lib/types";
+import type { PointCarte } from "@/lib/types";
+import { useEtatVue, HAUTEUR_GRAPHIQUE_INITIALE } from "@/lib/hooks/useEtatVue";
 
 interface PropsNavigationVueClient {
   navigationId: string;
@@ -23,9 +24,6 @@ interface PropsNavigationVueClient {
   maxSpeedKn: number | null;
 }
 
-const HAUTEUR_GRAPHIQUE_INITIALE = 200;
-const MARGE_GRAPHIQUE = 56;
-
 export default function NavigationVueClient({
   navigationId,
   nom,
@@ -40,35 +38,28 @@ export default function NavigationVueClient({
   maxSpeedKn,
 }: PropsNavigationVueClient) {
   const router = useRouter();
-  const [paddingBas, setPaddingBas] = useState(
-    HAUTEUR_GRAPHIQUE_INITIALE + MARGE_GRAPHIQUE
-  );
-  const [pointActifIndex, setPointActifIndex] = useState<number | null>(null);
-  const [donneeGraphee, setDonneeGraphee] = useState<DonneeGraphee>("vitesse");
+  const {
+    paddingBas,
+    pointActifIndex,
+    setPointActifIndex,
+    donneeGraphee,
+    setDonneeGraphee,
+    capDisponible,
+    pointActif,
+    handleHauteurChange,
+  } = useEtatVue(points);
 
   // Edition metadonnees — synchro avec props serveur apres refresh
   const [nomEdite, setNomEdite] = useState(nom);
   const [enEditionNom, setEnEditionNom] = useState(false);
   const [typeEdite, setTypeEdite] = useState(type);
-  const [dateEditee, setDateEditee] = useState(date.slice(0, 10)); // YYYY-MM-DD
+  const [dateEditee, setDateEditee] = useState(date.slice(0, 10));
 
-  useEffect(() => { setNomEdite(nom); }, [nom]);
-  useEffect(() => { setTypeEdite(type); }, [type]);
-  useEffect(() => { setDateEditee(date.slice(0, 10)); }, [date]);
-
-  const capDisponible = useMemo(
-    () => points.some((p) => p.headingDeg != null),
-    [points]
-  );
-
-  const pointActif = useMemo(() => {
-    if (pointActifIndex == null) return null;
-    return points.find((p) => p.pointIndex === pointActifIndex) ?? null;
-  }, [points, pointActifIndex]);
-
-  const handleHauteurChange = useCallback((hauteur: number) => {
-    setPaddingBas(hauteur + MARGE_GRAPHIQUE);
-  }, []);
+  useEffect(() => {
+    setNomEdite(nom);
+    setTypeEdite(type);
+    setDateEditee(date.slice(0, 10));
+  }, [nom, type, date]);
 
   // Sauvegarde generique d'un champ via PATCH
   const sauvegarderChamp = useCallback(
@@ -122,12 +113,6 @@ export default function NavigationVueClient({
     },
     [date, sauvegarderChamp]
   );
-
-  const dateFormatee = new Date(date).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   return (
     <div style={{ "--hauteur-graphique": `${paddingBas}px` } as React.CSSProperties}>

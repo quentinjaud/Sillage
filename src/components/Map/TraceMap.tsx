@@ -94,15 +94,6 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
   const [popupInfo, setPopupInfo] = useState<InfoPopup | null>(null);
   const [panneauCouchesOuvert, setPanneauCouchesOuvert] = useState(false);
 
-  // Guard : pas de points → message au lieu d'un crash
-  if (points.length === 0) {
-    return (
-      <div className="map-loading">
-        <p className="map-loading-text">Aucun point à afficher</p>
-      </div>
-    );
-  }
-
   const limites = useMemo(() => {
     const lons = points.map((p) => p.lon);
     const lats = points.map((p) => p.lat);
@@ -254,6 +245,14 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
     if (pointActifIndex == null) return null;
     return points.find((p) => p.pointIndex === pointActifIndex) ?? null;
   }, [points, pointActifIndex]);
+
+  if (points.length === 0) {
+    return (
+      <div className="map-loading">
+        <p className="map-loading-text">Aucun point à afficher</p>
+      </div>
+    );
+  }
 
   return (
     <div className="map-wrapper" style={{ position: "relative" }}>

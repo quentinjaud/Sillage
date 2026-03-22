@@ -18,6 +18,7 @@ import {
   vitesseVersCouleur,
 } from "@/lib/geo/couleur-vitesse";
 import type { PointCarte, DonneeGraphee } from "@/lib/types";
+import { sousechantillonner } from "@/lib/utilitaires";
 
 interface PropsTraceChart {
   points: PointCarte[];
@@ -51,20 +52,6 @@ const CONFIG_DONNEES: Record<
   },
 };
 
-function sousechantillonner<T>(donnees: T[], pointsMax: number): T[] {
-  if (donnees.length <= pointsMax) return donnees;
-  const pas = donnees.length / pointsMax;
-  const resultat: T[] = [];
-  for (let i = 0; i < pointsMax; i++) {
-    resultat.push(donnees[Math.round(i * pas)]);
-  }
-  const dernierIndex = donnees.length - 1;
-  if (Math.round((pointsMax - 1) * pas) !== dernierIndex) {
-    resultat.push(donnees[dernierIndex]);
-  }
-  return resultat;
-}
-
 interface DonneeGraphique {
   heure: string;
   valeur: number;
@@ -94,7 +81,7 @@ export default function TraceChart({
           })),
         500
       ),
-    [points, config.cle]
+    [points, donnee]
   );
 
   const gradientStops = useMemo(() => {
