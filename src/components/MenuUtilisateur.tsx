@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
+import { Menu, UnstyledButton } from "@mantine/core";
 
 export function MenuUtilisateur() {
   const routeur = useRouter();
@@ -34,16 +35,10 @@ export function MenuUtilisateur() {
     <>
       <nav className="app-header-nav">
         <Link
-          href="/traces"
-          className={`app-header-nav-link ${pathname === "/traces" ? "active" : ""}`}
+          href="/journal"
+          className={`app-header-nav-link ${pathname === "/journal" ? "active" : ""}`}
         >
-          Traces
-        </Link>
-        <Link
-          href="/bateaux"
-          className={`app-header-nav-link ${pathname === "/bateaux" ? "active" : ""}`}
-        >
-          Bateaux
+          Journal
         </Link>
         {estAdmin && (
           <Link
@@ -56,16 +51,31 @@ export function MenuUtilisateur() {
       </nav>
       <div className="app-header-spacer" />
       <div className="app-header-user">
-        <span className="app-header-user-name">{session.user.name}</span>
-        <button
-          className="app-header-logout-btn"
-          onClick={async () => {
-            await signOut();
-            routeur.push("/");
-          }}
-        >
-          Deconnexion
-        </button>
+        <Menu shadow="md" width={200} position="bottom-end">
+          <Menu.Target>
+            <UnstyledButton className="app-header-user-menu-btn">
+              {session.user.name} ▾
+            </UnstyledButton>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item component={Link} href="/traces">
+              Mes traces
+            </Menu.Item>
+            <Menu.Item component={Link} href="/bateaux">
+              Mes bateaux
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              color="red"
+              onClick={async () => {
+                await signOut();
+                routeur.push("/");
+              }}
+            >
+              Deconnexion
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </div>
     </>
   );
