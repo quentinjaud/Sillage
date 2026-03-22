@@ -1,5 +1,5 @@
 /**
- * Constantes de couleurs du thème Navimeter.
+ * Constantes de couleurs du thème Sillage.
  * Source de vérité unique pour les couleurs, utilisable partout
  * (y compris dans les contextes non-React comme Recharts).
  *

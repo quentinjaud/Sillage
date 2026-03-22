@@ -1,4 +1,4 @@
-# Navimeter — Changelog
+# Sillage — Changelog
 
 ## v0.4.1 — Phase 3b : Vue navigation immersive (2026-03-22)
 

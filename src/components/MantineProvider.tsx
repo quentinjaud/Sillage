@@ -3,7 +3,7 @@
 import { MantineProvider, createTheme } from '@mantine/core';
 
 /**
- * Palette Mantine générée autour du bleu Navimeter #43728B.
+ * Palette Mantine générée autour du bleu Sillage #43728B.
  * 10 nuances du plus clair au plus foncé (convention Mantine).
  */
 const navBleu = [

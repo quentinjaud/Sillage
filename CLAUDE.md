@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Navimeter
+# Sillage
 
 App d'analyse de traces de navigation a voile — journal de bord + analyse de performance.
 

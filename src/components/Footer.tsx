@@ -13,7 +13,7 @@ export function Footer() {
   return (
     <footer className="app-footer">
       <span className="app-footer-version">
-        Navimeter v{packageJson.version}
+        Sillage v{packageJson.version}
       </span>
       <span className="app-footer-deps">
         {Object.entries(dependances).map(([nom, version]) => (

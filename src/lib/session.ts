@@ -83,7 +83,7 @@ export async function obtenirIdUtilisateurEffectif(
 
   try {
     const jar = await cookies();
-    const cookie = jar.get("navimeter-impersonate");
+    const cookie = jar.get("sillage-impersonate");
     if (cookie?.value) {
       const idCible = cookie.value.split(":")[0];
       if (idCible && idCible !== session.user.id) {

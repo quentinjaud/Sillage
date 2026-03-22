@@ -36,7 +36,7 @@ export async function POST(requete: NextRequest) {
     }
 
     const reponse = NextResponse.json({ ok: true, user: cible });
-    reponse.cookies.set("navimeter-impersonate", `${cible.id}:${cible.name}`, {
+    reponse.cookies.set("sillage-impersonate", `${cible.id}:${cible.name}`, {
       path: "/",
       maxAge: 60 * 60, // 1 heure
       sameSite: "lax",
@@ -56,7 +56,7 @@ export async function DELETE() {
   }
 
   const reponse = NextResponse.json({ ok: true });
-  reponse.cookies.set("navimeter-impersonate", "", {
+  reponse.cookies.set("sillage-impersonate", "", {
     path: "/",
     maxAge: 0,
   });

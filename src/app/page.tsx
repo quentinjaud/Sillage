@@ -13,7 +13,7 @@ export default async function PageAccueil() {
 
   return (
     <div className="landing-hero">
-      <h1 className="landing-title">Navimeter</h1>
+      <h1 className="landing-title">Sillage</h1>
       <p className="landing-subtitle">
         Le carnet de bord intelligent du navigateur. Analysez vos traces GPS,
         suivez vos performances et documentez vos navigations.

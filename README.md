@@ -1,4 +1,4 @@
-# Navimeter
+# Sillage
 
 Analyse de traces de navigation à voile.
 

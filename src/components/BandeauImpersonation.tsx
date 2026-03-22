@@ -12,7 +12,7 @@ export function BandeauImpersonation() {
   const [chargement, setChargement] = useState(false);
 
   useEffect(() => {
-    const valeur = lireCookie("navimeter-impersonate");
+    const valeur = lireCookie("sillage-impersonate");
     if (valeur) {
       // Format: "userId:nom"
       const nom = valeur.split(":").slice(1).join(":");

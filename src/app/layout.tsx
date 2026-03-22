@@ -15,7 +15,7 @@ const atkinson = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Navimeter",
+  title: "Sillage",
   description: "Journal de navigation et analyse de performance à la voile",
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({
           <BandeauImpersonation />
           <header className="app-header">
             <a href="/" className="app-header-title">
-              Navimeter
+              Sillage
             </a>
             <MenuUtilisateur />
           </header>

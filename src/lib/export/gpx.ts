@@ -12,7 +12,7 @@ interface PointExport {
 export function genererGpx(nom: string, points: PointExport[]): string {
   const lignes: string[] = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<gpx version="1.1" creator="Navimeter"',
+    '<gpx version="1.1" creator="Sillage"',
     '  xmlns="http://www.topografix.com/GPX/1/1">',
     "  <trk>",
     `    <name>${echapperXml(nom)}</name>`,

@@ -1,4 +1,4 @@
-# Navimeter — Roadmap
+# Sillage — Roadmap
 
 ## Vision
 
@@ -6,7 +6,7 @@ Fusionner deux approches complémentaires en un seul outil :
 - **Journal de bord** (inspiration Navygatio) : documenter ses navigations avec events, photos géolocalisées, organisation par bateaux et dossiers, partage public
 - **Analyse de performance** (inspiration ChartedSails) : VMG, détection de legs/manoeuvres, données vent, polaires, comparaison multi-bateaux
 
-Navimeter = **le carnet de bord intelligent du navigateur**.
+Sillage = **le carnet de bord intelligent du navigateur**.
 
 ## Architecture des 3 espaces
 
