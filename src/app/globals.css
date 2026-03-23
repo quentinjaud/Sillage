@@ -1733,6 +1733,21 @@ body:has(.trace-vue-layout) .app-main {
 .point-actif-pill-donnee {
   cursor: pointer;
   transition: background 0.15s;
+  position: relative;
+}
+
+.point-actif-pill-donnee[data-label]::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: whitesmoke;
+  text-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
 }
 
 .point-actif-pill-donnee:hover:not(:disabled) {
