@@ -117,8 +117,27 @@ export interface PointCarte {
   pointIndex: number;
 }
 
+export interface CelluleMeteoClient {
+  latitude: number;
+  longitude: number;
+  dateDebut: string;
+  dateFin: string;
+  ventVitesseKn: number;
+  ventRafalesKn: number;
+  ventDirectionDeg: number;
+}
+
+export interface StatsVent {
+  ventMoyenKn: number;
+  rafalesMaxKn: number;
+  directionMoyenneDeg: number;
+  variationDirectionDeg: number;
+  source: string;
+  resolution: string;
+}
+
 /** Donnee affichee dans le graphique — extensible pour NMEA futur */
-export type DonneeGraphee = "vitesse" | "cap";
+export type DonneeGraphee = "vitesse" | "cap" | "vent";
 
 // === Journal de bord ===
 
