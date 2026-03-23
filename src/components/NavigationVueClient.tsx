@@ -136,6 +136,7 @@ export default function NavigationVueClient({
   const [ventDeploye, setVentDeploye] = useState(false);
   const [statsReduit, setStatsReduit] = useState(false);
   const [donneeVentDeployee, setDonneeVentDeployee] = useState<"vent" | "ventDirection">("vent");
+  const [mapBearing, setMapBearing] = useState(0);
 
   const handleMeteoSupprimee = useCallback(() => {
     setStatsVentState(null);
@@ -258,6 +259,7 @@ export default function NavigationVueClient({
           ventDeploye={ventDeploye}
           donneeVentDeployee={donneeVentDeployee}
           onClickRoseDesVents={handleClickRoseDesVents}
+          onBearingChange={setMapBearing}
         />
       </div>
 
@@ -287,6 +289,7 @@ export default function NavigationVueClient({
                 statsVent={statsVentState}
                 ventDeploye={ventDeploye}
                 donneeVentDeployee={donneeVentDeployee}
+                mapBearing={mapBearing}
                 onClick={handleClickRoseDesVents}
               />
             </>
@@ -296,6 +299,7 @@ export default function NavigationVueClient({
               statsVent={statsVentState}
               ventDeploye={ventDeploye}
               donneeVentDeployee={donneeVentDeployee}
+              mapBearing={mapBearing}
               onClick={handleClickRoseDesVents}
             />
           )}

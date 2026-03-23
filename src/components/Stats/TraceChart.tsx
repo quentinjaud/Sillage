@@ -238,6 +238,28 @@ export default function TraceChart({
     return ((d.temps - tempsDebut) / duree) * 100;
   }, [pointFixeIndex, donneesActives, tempsDebut, duree]);
 
+  // Position et contenu du tooltip actif (toujours nav + vent si dispo)
+  const tooltipActif = useMemo(() => {
+    if (pointActifIndex == null || donneesActives.length < 2) return null;
+    const d = donneesActives.find((d) => d.pointIndex === pointActifIndex);
+    if (!d) return null;
+    const pct = ((d.temps - tempsDebut) / duree) * 100;
+    const heure = format(new Date(d.temps), "HH:mm:ss");
+    const ts = new Date(d.temps).toISOString();
+
+    // Donnees nav
+    const pointGps = points.find((p) => p.timestamp && Math.abs(new Date(p.timestamp).getTime() - d.temps) < 5000);
+    const vitesse = pointGps?.speedKn ?? null;
+    const cap = pointGps?.headingDeg ?? null;
+
+    // Donnees vent
+    const cellule = cellulesMeteo?.length
+      ? trouverCelluleActive(cellulesMeteo, ts, pointGps?.lat ?? 0, pointGps?.lon ?? 0)
+      : null;
+
+    return { pct, heure, vitesse, cap, force: cellule ? Math.round(cellule.ventVitesseKn) : null, dir: cellule ? Math.round(cellule.ventDirectionDeg) : null };
+  }, [pointActifIndex, donneesActives, tempsDebut, duree, cellulesMeteo, points]);
+
   // Gradient toujours base sur la vitesse (lecture croisee)
   const donneesVitesse = useMemo(
     () =>
@@ -441,43 +463,7 @@ export default function TraceChart({
             width={25}
             domain={modeVent ? (modeVentDirection ? CONFIG_VENT_DIR.domaine : undefined) : config.domaine}
           />
-          <Tooltip
-            content={({ active, label }) => {
-              if (!active || label == null) return null;
-              const t = Number(label);
-              const heure = format(new Date(t), "HH:mm:ss");
-
-              if (modeVent) {
-                // Tooltip vent : force + direction
-                const cellule = cellulesMeteo?.length
-                  ? trouverCelluleActive(cellulesMeteo, new Date(t).toISOString(), 0, 0)
-                  : null;
-                const force = cellule ? `${Math.round(cellule.ventVitesseKn)} kn` : "—";
-                const dir = cellule ? `${Math.round(cellule.ventDirectionDeg)}°` : "—";
-                return (
-                  <div className="chart-tooltip-compact">
-                    <span className="chart-tooltip-heure">{heure}</span>
-                    <span className="chart-tooltip-val" title="Force du vent"><Wind size={11} /> {force}</span>
-                    <span className="chart-tooltip-val" title="Direction du vent"><Navigation2 size={11} /> {dir}</span>
-                  </div>
-                );
-              }
-
-              // Tooltip nav : vitesse + cap
-              const pt = donneesActives.find((d) => d.temps === t);
-              const vitesse = pt ? `${pt.valeur.toFixed(1)} kn` : "—";
-              // Trouver le cap pour ce point
-              const pointGps = points.find((p) => p.timestamp && Math.abs(new Date(p.timestamp).getTime() - t) < 5000);
-              const cap = pointGps?.headingDeg != null ? `${Math.round(pointGps.headingDeg)}°` : "—";
-              return (
-                <div className="chart-tooltip-compact">
-                  <span className="chart-tooltip-heure">{heure}</span>
-                  <span className="chart-tooltip-val" title="Vitesse"><Gauge size={11} /> {vitesse}</span>
-                  <span className="chart-tooltip-val" title="Cap"><Compass size={11} /> {cap}</span>
-                </div>
-              );
-            }}
-          />
+          <Tooltip content={() => null} />
           {!modeVent && gradientStops && (
             <defs>
               <linearGradient id={strokeId} x1="0" y1="0" x2="1" y2="0">
@@ -533,6 +519,35 @@ export default function TraceChart({
           </>
         )}
       </div>
+
+      {/* Tooltip custom — positionne via pointActifIndex, visible sur les deux graphs */}
+      {tooltipActif && (() => {
+        const ml = sliderStyle?.left ?? 30;
+        const mr = sliderStyle?.right ?? 5;
+        const cw = conteneurRef.current?.clientWidth ?? 0;
+        const px = ml + (tooltipActif.pct / 100) * (cw - ml - mr);
+        return (
+        <div
+          className="chart-tooltip-custom"
+          style={{ left: px }}
+        >
+          <div className="chart-tooltip-compact">
+            <span className="chart-tooltip-heure">{tooltipActif.heure}</span>
+            {modeVent ? (
+              <>
+                <span className="chart-tooltip-val"><Wind size={11} /> {tooltipActif.force ?? "—"} kn</span>
+                <span className="chart-tooltip-val"><Navigation2 size={11} /> {tooltipActif.dir ?? "—"}°</span>
+              </>
+            ) : (
+              <>
+                <span className="chart-tooltip-val"><Gauge size={11} /> {tooltipActif.vitesse != null ? `${tooltipActif.vitesse.toFixed(1)} kn` : "—"}</span>
+                <span className="chart-tooltip-val"><Compass size={11} /> {tooltipActif.cap != null ? `${Math.round(tooltipActif.cap)}°` : "—"}</span>
+              </>
+            )}
+          </div>
+        </div>
+        );
+      })()}
     </div>
   );
 }

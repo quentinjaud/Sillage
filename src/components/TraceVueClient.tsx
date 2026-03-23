@@ -53,6 +53,7 @@ export default function TraceVueClient({
 
   const [cellulesMeteoState, setCellulesMeteoState] = useState(cellulesMeteo ?? []);
   const [statsVentState, setStatsVentState] = useState(statsVent ?? null);
+  const [mapBearing, setMapBearing] = useState(0);
 
   const handleMeteoChargee = useCallback(
     (data: { statsVent: StatsVent; cellules: CelluleMeteoClient[] }) => {
@@ -130,6 +131,7 @@ export default function TraceVueClient({
           ventDeploye={ventDeploye}
           donneeVentDeployee={donneeVentDeployee}
           onClickRoseDesVents={handleClickRoseDesVents}
+          onBearingChange={setMapBearing}
         />
       </div>
 
@@ -159,6 +161,7 @@ export default function TraceVueClient({
                 statsVent={statsVentState}
                 ventDeploye={ventDeploye}
                 donneeVentDeployee={donneeVentDeployee}
+                mapBearing={mapBearing}
                 onClick={handleClickRoseDesVents}
               />
             </>
@@ -168,6 +171,7 @@ export default function TraceVueClient({
               statsVent={statsVentState}
               ventDeploye={ventDeploye}
               donneeVentDeployee={donneeVentDeployee}
+              mapBearing={mapBearing}
               onClick={handleClickRoseDesVents}
             />
           )}

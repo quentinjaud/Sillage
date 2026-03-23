@@ -11,7 +11,7 @@
 
   /* Accents bleu */
   --accent: #43728B;
-  --accent-dark: #365d73;
+  --accent-dark: #050505;
   --accent-light: #e8f0f4;
   --accent-hover: #d4e4eb;
 
@@ -638,11 +638,26 @@ body {
   background: #3a6479;
 }
 
+/* Indicateur vent sur la carte — grosse icone semi-transparente */
+.map-indicateur-vent {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  margin-left: -30px;
+  color: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  z-index: 1;
+  transform: rotate(90deg);
+}
+
 .map-couche-spacer {
   height: 4px;
 }
 
 .map-couches-panneau {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
   background: rgba(255, 253, 249, 0.95);
   backdrop-filter: blur(8px);
   border-radius: 10px;
@@ -652,6 +667,8 @@ body {
   flex-direction: column;
   gap: 2px;
   min-width: 120px;
+  white-space: nowrap;
+  z-index: 20;
 }
 
 .map-couche-option {
@@ -1844,10 +1861,9 @@ body:has(.trace-vue-layout) .app-main {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+  background: #2c2c2c;
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: 20px;
   font-size: 11px;
   white-space: nowrap;
 }
@@ -1860,6 +1876,27 @@ body:has(.trace-vue-layout) .app-main {
 .chart-tooltip-val {
   color: white;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.chart-tooltip-sep {
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 300;
+}
+
+.chart-tooltip-custom {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.chart-container--compact .chart-tooltip-custom {
+  top: auto;
+  bottom: 4px;
 }
 
 .hud-vent-deploye .chart-slider-zone {
@@ -2079,6 +2116,29 @@ body:has(.nettoyage-layout) .app-main {
 .rose-des-vents:hover {
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+.rose-des-vents-rose {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.rose-des-vents-fond {
+  display: block;
+}
+
+.rose-des-vents-icone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.3s ease;
 }
 
 .rose-des-vents-vitesse {
