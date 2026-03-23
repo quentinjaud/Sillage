@@ -10,7 +10,7 @@ import {
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import NavigationVueClient from "@/components/NavigationVueClient";
-import { calculerStatsVent } from "@/lib/geo/stats-vent";
+import { calculerStatsVent, filtrerCellulesParPlage } from "@/lib/geo/stats-vent";
 import type { CelluleMeteoClient } from "@/lib/types";
 
 interface PropsPage {
@@ -65,13 +65,19 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
     ventDirectionDeg: c.ventDirectionDeg,
   }));
 
-  const statsVent =
-    cellulesMeteo.length > 0
-      ? { ...calculerStatsVent(cellulesMeteo), source: "open-meteo-archive", resolution: "25km/1h" }
-      : null;
-
   const pointsAvecTimestamp = trace?.points.filter((p) => p.timestamp != null) ?? [];
   const traceTimestamps = pointsAvecTimestamp.length > 0;
+
+  // Filtrer les cellules meteo sur la plage de navigation pour les stats
+  const premierTs = pointsAvecTimestamp[0]?.timestamp;
+  const dernierTs = pointsAvecTimestamp[pointsAvecTimestamp.length - 1]?.timestamp;
+  const cellulesNav = premierTs && dernierTs
+    ? filtrerCellulesParPlage(cellulesMeteo, premierTs.toISOString(), dernierTs.toISOString())
+    : cellulesMeteo;
+  const statsVent =
+    cellulesMeteo.length > 0
+      ? { ...calculerStatsVent(cellulesNav), source: "open-meteo-archive", resolution: "25km/1h" }
+      : null;
   const traceTropRecente =
     traceTimestamps &&
     (() => {

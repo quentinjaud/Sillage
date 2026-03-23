@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import TraceVueClient from "@/components/TraceVueClient";
 import TitreEditable from "@/components/TitreEditable";
-import { calculerStatsVent } from "@/lib/geo/stats-vent";
+import { calculerStatsVent, filtrerCellulesParPlage } from "@/lib/geo/stats-vent";
 import type { CelluleMeteoClient } from "@/lib/types";
 
 interface PropsPage {
@@ -55,12 +55,19 @@ export default async function TraceDetailPage({ params }: PropsPage) {
     ventDirectionDeg: c.ventDirectionDeg,
   }));
 
+  const traceTimestamps = pointsNonExclus.some((p) => p.timestamp != null);
+
+  // Filtrer les cellules meteo sur la plage de navigation pour les stats
+  const pointsAvecTs = pointsNonExclus.filter((p) => p.timestamp);
+  const premierTs = pointsAvecTs[0]?.timestamp;
+  const dernierTs = pointsAvecTs[pointsAvecTs.length - 1]?.timestamp;
+  const cellulesNav = premierTs && dernierTs
+    ? filtrerCellulesParPlage(cellulesMeteo, premierTs.toISOString(), dernierTs.toISOString())
+    : cellulesMeteo;
   const statsVent =
     cellulesMeteo.length > 0
-      ? { ...calculerStatsVent(cellulesMeteo), source: "open-meteo-archive", resolution: "25km/1h" }
+      ? { ...calculerStatsVent(cellulesNav), source: "open-meteo-archive", resolution: "25km/1h" }
       : null;
-
-  const traceTimestamps = pointsNonExclus.some((p) => p.timestamp != null);
   const traceTropRecente =
     traceTimestamps &&
     pointsNonExclus.length > 0 &&

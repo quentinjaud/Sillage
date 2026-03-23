@@ -38,6 +38,25 @@ export function ecartTypeCirculaire(anglesDeg: number[]): number {
 }
 
 /**
+ * Filtre les cellules meteo pour ne garder que celles qui chevauchent
+ * la plage temporelle de la navigation (premier → dernier timestamp).
+ */
+export function filtrerCellulesParPlage(
+  cellules: CelluleMeteoClient[],
+  debutNav: string,
+  finNav: string
+): CelluleMeteoClient[] {
+  const tDebut = new Date(debutNav).getTime();
+  const tFin = new Date(finNav).getTime();
+  return cellules.filter((c) => {
+    const cDebut = new Date(c.dateDebut).getTime();
+    const cFin = new Date(c.dateFin).getTime();
+    // La cellule chevauche la plage de nav
+    return cFin > tDebut && cDebut < tFin;
+  });
+}
+
+/**
  * Calcule les stats vent agregees a partir des cellules meteo.
  * Moyenne vitesse ponderee par duree, rafales max, direction circulaire.
  */

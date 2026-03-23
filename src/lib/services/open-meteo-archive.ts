@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { calculerStatsVent } from "../geo/stats-vent";
+import { calculerStatsVent, filtrerCellulesParPlage } from "../geo/stats-vent";
 import type { StatsVent, CelluleMeteoClient } from "../types";
 
 const OPEN_METEO_ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive";
@@ -133,8 +133,14 @@ export async function chargerVentOpenMeteo(traceId: string): Promise<{
     ventDirectionDeg: l.ventDirectionDeg,
   }));
 
+  // Stats calculees uniquement sur la plage de navigation
+  const cellulesNav = filtrerCellulesParPlage(
+    cellulesClient,
+    premierTimestamp.toISOString(),
+    dernierTimestamp.toISOString()
+  );
   const statsVent: StatsVent = {
-    ...calculerStatsVent(cellulesClient),
+    ...calculerStatsVent(cellulesNav),
     source: "open-meteo-archive",
     resolution: "25km/1h",
   };
