@@ -15,7 +15,7 @@ App d'analyse de traces de navigation a voile — journal de bord + analyse de p
 ## Conventions
 
 - **Langue** : tout en francais (UI, code, commits). Nommage sans accents (`formaterDuree`, `PointAnalyse`)
-- **Unites** : noeuds (kn), milles nautiques (NM), degres
+- **Unites** : noeuds (kt), milles nautiques (NM), degres
 - **Charte** : jaune #F6BC00, bleu #43728B, fond creme #FFFDF9 — voir `src/lib/theme.ts`
 - **Police** : Atkinson Hyperlegible Next
 - **Desktop-first** : le responsive est secondaire
@@ -29,6 +29,12 @@ npm run build        # Build production (inclut prisma generate)
 npm run db:migrate   # Prisma migrate dev
 npm run db:studio    # Prisma Studio (port 5555)
 ```
+
+## Workflow commits
+
+- **Journaliser** : mettre a jour `CHANGELOG.md` a chaque session avant de push
+- **Commits UI/UX** : ne pas commiter chaque micro-ajustement CSS. Attendre la fin d'une passe de polish pour commiter un lot coherent
+- **Branche** : creer une branche feat avant de commencer une feature, pas commiter sur main directement
 
 ## Deploiement
 
