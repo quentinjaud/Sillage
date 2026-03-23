@@ -65,6 +65,12 @@ interface DonneeGraphique {
 /** Marge par defaut de Recharts LineChart */
 const MARGE_DROITE_PLOT = 5;
 
+const CONFIG_VENT = {
+  titre: "Vent",
+  unite: "kn",
+  formater: (v: number) => `${v.toFixed(1)} kn`,
+};
+
 export default function TraceChart({
   points,
   donnee,
@@ -72,9 +78,12 @@ export default function TraceChart({
   pointFixeIndex,
   onHoverPoint,
   onClickPoint,
-  cellulesMeteo: _cellulesMeteo,
+  cellulesMeteo,
 }: PropsTraceChart) {
-  // "vent" sera rendu dans une future tache — repli sur vitesse si necessaire
+  // Mode vent actif si donnee === "vent" ET des cellules sont disponibles
+  const modeVent = donnee === "vent" && (cellulesMeteo?.length ?? 0) > 0;
+
+  // Pour les modes vitesse/cap, repli sur vitesse si vent sans cellules
   const donneeEffective: Exclude<DonneeGraphee, "vent"> =
     donnee === "vent" ? "vitesse" : donnee;
   const config = CONFIG_DONNEES[donneeEffective];
@@ -106,6 +115,29 @@ export default function TraceChart({
     [points, donneeEffective]
   );
 
+  // Dataset vent : un point par heure, centre de l'intervalle, moyenne si plusieurs cellules
+  const donneesVent = useMemo((): DonneeGraphique[] => {
+    if (!cellulesMeteo || cellulesMeteo.length === 0) return [];
+    // Regrouper par timestamp central
+    const parTimestamp = new Map<number, number[]>();
+    for (const cellule of cellulesMeteo) {
+      const debut = new Date(cellule.dateDebut).getTime();
+      const fin = new Date(cellule.dateFin).getTime();
+      const centre = Math.round((debut + fin) / 2);
+      const existantes = parTimestamp.get(centre) ?? [];
+      existantes.push(cellule.ventVitesseKn);
+      parTimestamp.set(centre, existantes);
+    }
+    return Array.from(parTimestamp.entries())
+      .map(([temps, vitesses], i) => ({
+        temps,
+        heure: new Date(temps).toISOString(),
+        valeur: vitesses.reduce((a, b) => a + b, 0) / vitesses.length,
+        pointIndex: i,
+      }))
+      .sort((a, b) => a.temps - b.temps);
+  }, [cellulesMeteo]);
+
   useEffect(() => {
     const el = conteneurRef.current;
     if (!el) return;
@@ -132,23 +164,26 @@ export default function TraceChart({
       clearTimeout(timer);
       resizeObs.disconnect();
     };
-  }, [donneesGraphique]);
+  }, [donneesGraphique, donneesVent]);
+
+  // Dataset actif selon le mode
+  const donneesActives = modeVent ? donneesVent : donneesGraphique;
 
   // Plage temporelle
   const { tempsDebut, duree } = useMemo(() => {
-    if (donneesGraphique.length === 0) return { tempsDebut: 0, duree: 1 };
-    const debut = donneesGraphique[0].temps;
-    const fin = donneesGraphique[donneesGraphique.length - 1].temps;
+    if (donneesActives.length === 0) return { tempsDebut: 0, duree: 1 };
+    const debut = donneesActives[0].temps;
+    const fin = donneesActives[donneesActives.length - 1].temps;
     return { tempsDebut: debut, duree: fin - debut || 1 };
-  }, [donneesGraphique]);
+  }, [donneesActives]);
 
   // Position du thumb fixe en % — par temps (coherent avec l'axe numerique)
   const positionThumbFixe = useMemo(() => {
-    if (pointFixeIndex == null || donneesGraphique.length < 2) return null;
-    const d = donneesGraphique.find((d) => d.pointIndex === pointFixeIndex);
+    if (pointFixeIndex == null || donneesActives.length < 2) return null;
+    const d = donneesActives.find((d) => d.pointIndex === pointFixeIndex);
     if (!d) return null;
     return ((d.temps - tempsDebut) / duree) * 100;
-  }, [pointFixeIndex, donneesGraphique, tempsDebut, duree]);
+  }, [pointFixeIndex, donneesActives, tempsDebut, duree]);
 
   // Gradient toujours base sur la vitesse (lecture croisee)
   const donneesVitesse = useMemo(
@@ -178,9 +213,9 @@ export default function TraceChart({
 
   const tempsSurvole = useMemo(() => {
     if (pointActifIndex == null) return null;
-    const d = donneesGraphique.find((d) => d.pointIndex === pointActifIndex);
+    const d = donneesActives.find((d) => d.pointIndex === pointActifIndex);
     return d?.temps ?? null;
-  }, [pointActifIndex, donneesGraphique]);
+  }, [pointActifIndex, donneesActives]);
 
   // Ref pour capturer le dernier point survole (utilise par onClick)
   const dernierPointSurvoleRef = useRef<number | null>(null);
@@ -193,7 +228,7 @@ export default function TraceChart({
       if (state?.activePayload?.[0]?.payload?.pointIndex !== undefined) {
         idx = state.activePayload[0].payload.pointIndex;
       } else if (state?.activeLabel != null) {
-        const point = donneesGraphique.find(
+        const point = donneesActives.find(
           (d) => d.temps === state.activeLabel
         );
         if (point) idx = point.pointIndex;
@@ -203,7 +238,7 @@ export default function TraceChart({
         onHoverPoint(idx);
       }
     },
-    [onHoverPoint, donneesGraphique]
+    [onHoverPoint, donneesActives]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -218,11 +253,11 @@ export default function TraceChart({
   // Trouve le point le plus proche d'un ratio (0-1) sur la plage temporelle
   const trouverPointParRatio = useCallback(
     (ratio: number) => {
-      if (donneesGraphique.length === 0) return null;
+      if (donneesActives.length === 0) return null;
       const tempsCible = tempsDebut + ratio * duree;
-      let meilleur = donneesGraphique[0];
+      let meilleur = donneesActives[0];
       let meilleureDiff = Infinity;
-      for (const d of donneesGraphique) {
+      for (const d of donneesActives) {
         const diff = Math.abs(d.temps - tempsCible);
         if (diff < meilleureDiff) {
           meilleureDiff = diff;
@@ -231,7 +266,7 @@ export default function TraceChart({
       }
       return meilleur.pointIndex;
     },
-    [donneesGraphique, tempsDebut, duree]
+    [donneesActives, tempsDebut, duree]
   );
 
   // Drag du thumb slider — logique partagee mouse/touch
@@ -309,7 +344,7 @@ export default function TraceChart({
     [onHoverPoint, trouverPointParRatio, sliderStyle]
   );
 
-  if (donneesGraphique.length < 2) {
+  if (donneesActives.length < 2) {
     return (
       <div className="chart-empty">
         Pas assez de donnees pour afficher le graphique
@@ -318,14 +353,17 @@ export default function TraceChart({
   }
 
   const strokeId = "gradient-vitesse";
-  const stroke = `url(#${strokeId})`;
+
+  // Titre et formateur selon le mode
+  const titreActif = modeVent ? CONFIG_VENT.titre : config.titre;
+  const formaterActif = modeVent ? CONFIG_VENT.formater : config.formater;
 
   return (
     <div className="chart-container" ref={conteneurRef} onTouchStart={handleTouchChart}>
-      <h3 className="chart-title">{config.titre}</h3>
+      <h3 className="chart-title">{titreActif}</h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={donneesGraphique}
+          data={donneesActives}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={onClickPoint ? handleClick : undefined}
@@ -344,13 +382,13 @@ export default function TraceChart({
             tick={{ fontSize: 10, fill: "#aaa" }}
             stroke="#ccc"
             width={25}
-            domain={config.domaine}
+            domain={modeVent ? undefined : config.domaine}
           />
           <Tooltip
             labelFormatter={(t) =>
               format(new Date(t as number), "HH:mm:ss")
             }
-            formatter={(value) => [config.formater(Number(value)), config.titre]}
+            formatter={(value) => [formaterActif(Number(value)), titreActif]}
             contentStyle={{
               backgroundColor: COULEURS.fond,
               border: `1px solid ${COULEURS.bordure}`,
@@ -358,7 +396,7 @@ export default function TraceChart({
               fontSize: 12,
             }}
           />
-          {gradientStops && (
+          {!modeVent && gradientStops && (
             <defs>
               <linearGradient id={strokeId} x1="0" y1="0" x2="1" y2="0">
                 {gradientStops.map((stop, i) => (
@@ -374,7 +412,7 @@ export default function TraceChart({
           <Line
             type="monotone"
             dataKey="valeur"
-            stroke={stroke}
+            stroke={modeVent ? "#43728B" : `url(#${strokeId})`}
             dot={false}
             strokeWidth={1.5}
           />
