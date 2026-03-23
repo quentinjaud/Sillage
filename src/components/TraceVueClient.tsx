@@ -125,6 +125,7 @@ export default function TraceVueClient({
             donneeGraphee={donneeGraphee}
             onChangeDonneeGraphee={setDonneeGraphee}
             capDisponible={capDisponible}
+            celluleActive={celluleActive}
           />
         </div>
       )}

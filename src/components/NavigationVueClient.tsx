@@ -253,6 +253,7 @@ export default function NavigationVueClient({
             donneeGraphee={donneeGraphee}
             onChangeDonneeGraphee={setDonneeGraphee}
             capDisponible={capDisponible}
+            celluleActive={celluleActive}
           />
         </div>
       )}
