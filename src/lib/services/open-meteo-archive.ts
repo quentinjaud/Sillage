@@ -2,10 +2,11 @@ import { prisma } from "@/lib/db";
 import { calculerStatsVent, filtrerCellulesParPlage } from "../geo/stats-vent";
 import type { StatsVent, CelluleMeteoClient } from "../types";
 
-const OPEN_METEO_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast";
+const HISTORICAL_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast";
+const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 const MODELE = "meteofrance_arome_france";
 const GRILLE_DEG = 0.025; // ~2.5 km (resolution AROME)
-const DELAI_ARCHIVE_MS = 2 * 24 * 60 * 60 * 1000; // 2 jours (historical forecast dispo plus vite)
+const PARAMS_HORAIRES = "wind_speed_10m,wind_direction_10m,wind_gusts_10m";
 
 function arrondir(coord: number): number {
   return Math.round(coord / GRILLE_DEG) * GRILLE_DEG;
@@ -48,9 +49,11 @@ export async function chargerVentOpenMeteo(traceId: string): Promise<{
   }
 
   const dernierTimestamp = points[points.length - 1].timestamp!;
-  if (Date.now() - dernierTimestamp.getTime() < DELAI_ARCHIVE_MS) {
-    throw new Error("Trace trop recente — donnees disponibles apres 2 jours");
-  }
+  const premierTimestamp = points[0].timestamp!;
+
+  // Choisir l'API selon l'age de la trace
+  const ageJours = (Date.now() - dernierTimestamp.getTime()) / (24 * 60 * 60 * 1000);
+  const estRecente = ageJours < 2;
 
   let latMin = Infinity, latMax = -Infinity, lonMin = Infinity, lonMax = -Infinity;
   for (const p of points) {
@@ -60,7 +63,6 @@ export async function chargerVentOpenMeteo(traceId: string): Promise<{
     if (p.lon > lonMax) lonMax = p.lon;
   }
 
-  const premierTimestamp = points[0].timestamp!;
   const dateDebut = premierTimestamp.toISOString().split("T")[0];
   const dateFin = dernierTimestamp.toISOString().split("T")[0];
 
@@ -82,7 +84,10 @@ export async function chargerVentOpenMeteo(traceId: string): Promise<{
     const lats = batch.map((c) => c.lat).join(",");
     const lons = batch.map((c) => c.lon).join(",");
 
-    const url = `${OPEN_METEO_URL}?latitude=${lats}&longitude=${lons}&start_date=${dateDebut}&end_date=${dateFin}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=UTC&models=${MODELE}`;
+    // Trace recente : API Forecast avec past_days ; sinon : Historical Forecast
+    const url = estRecente
+      ? `${FORECAST_URL}?latitude=${lats}&longitude=${lons}&hourly=${PARAMS_HORAIRES}&wind_speed_unit=kn&timezone=UTC&models=${MODELE}&past_days=${Math.ceil(ageJours) + 1}&forecast_days=1`
+      : `${HISTORICAL_URL}?latitude=${lats}&longitude=${lons}&start_date=${dateDebut}&end_date=${dateFin}&hourly=${PARAMS_HORAIRES}&wind_speed_unit=kn&timezone=UTC&models=${MODELE}`;
 
     const response = await fetch(url);
     if (!response.ok) {

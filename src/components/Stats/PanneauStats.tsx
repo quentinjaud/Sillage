@@ -239,15 +239,6 @@ export default function PanneauStats({
               <Wind size={13} />
               Timestamps requis
             </button>
-          ) : traceTropRecente === true ? (
-            <button
-              className="stats-enrichir-btn stats-enrichir-btn--desactive"
-              disabled
-              type="button"
-            >
-              <Wind size={13} />
-              Disponible apres 2 jours
-            </button>
           ) : etat === "chargement" ? (
             <button
               className="stats-enrichir-btn stats-enrichir-btn--chargement"
