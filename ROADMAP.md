@@ -158,6 +158,12 @@ User
 - [ ] Export stats PDF + export image carte
 - [ ] Embed iframe
 
+## Phase 8 — Import automatique Navimetrix (v0.9)
+
+- [ ] Addon Navimetrix : streamer a la demande les traces + logs NMEA nouveaux depuis le dernier envoi, directement dans le compte de l'utilisateur sur Sillage
+- [ ] Synchronisation incrementale (delta depuis le dernier sync)
+- [ ] Import direct dans le journal de bord (creation automatique de navigations)
+
 ---
 
 ## Refactorings en attente

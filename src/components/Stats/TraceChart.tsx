@@ -13,12 +13,14 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { COULEURS } from "@/lib/theme";
+import { Gauge, Compass, Wind, Navigation2 } from "lucide-react";
 import {
   calculerStatsVitesse,
   vitesseVersCouleur,
 } from "@/lib/geo/couleur-vitesse";
-import type { PointCarte, DonneeGraphee } from "@/lib/types";
+import type { PointCarte, DonneeGraphee, CelluleMeteoClient } from "@/lib/types";
 import { sousechantillonner } from "@/lib/utilitaires";
+import { trouverCelluleActive } from "@/lib/geo/stats-vent";
 
 interface PropsTraceChart {
   points: PointCarte[];
@@ -27,10 +29,12 @@ interface PropsTraceChart {
   pointFixeIndex: number | null;
   onHoverPoint: (pointIndex: number | null) => void;
   onClickPoint?: (pointIndex: number | null) => void;
+  cellulesMeteo?: CelluleMeteoClient[];
+  compact?: boolean;
 }
 
 const CONFIG_DONNEES: Record<
-  DonneeGraphee,
+  Exclude<DonneeGraphee, "vent" | "ventDirection">,
   {
     titre: string;
     cle: keyof PointCarte;
@@ -64,6 +68,19 @@ interface DonneeGraphique {
 /** Marge par defaut de Recharts LineChart */
 const MARGE_DROITE_PLOT = 5;
 
+const CONFIG_VENT = {
+  titre: "Vent",
+  unite: "kn",
+  formater: (v: number) => `${v.toFixed(1)} kn`,
+};
+
+const CONFIG_VENT_DIR = {
+  titre: "Direction vent",
+  unite: "°",
+  formater: (v: number) => `${Math.round(v)}°`,
+  domaine: [0, 360] as [number, number],
+};
+
 export default function TraceChart({
   points,
   donnee,
@@ -71,8 +88,17 @@ export default function TraceChart({
   pointFixeIndex,
   onHoverPoint,
   onClickPoint,
+  cellulesMeteo,
+  compact,
 }: PropsTraceChart) {
-  const config = CONFIG_DONNEES[donnee];
+  // Mode vent actif si donnee === "vent" ou "ventDirection" ET des cellules sont disponibles
+  const modeVent = (donnee === "vent" || donnee === "ventDirection") && (cellulesMeteo?.length ?? 0) > 0;
+  const modeVentDirection = donnee === "ventDirection" && (cellulesMeteo?.length ?? 0) > 0;
+
+  // Pour les modes vitesse/cap, repli sur vitesse si vent sans cellules
+  const donneeEffective: Exclude<DonneeGraphee, "vent" | "ventDirection"> =
+    (donnee === "vent" || donnee === "ventDirection") ? "vitesse" : donnee;
+  const config = CONFIG_DONNEES[donneeEffective];
   const conteneurRef = useRef<HTMLDivElement>(null);
 
   // Mesure la position reelle de l'axe X via le DOM Recharts
@@ -98,7 +124,71 @@ export default function TraceChart({
           })),
         500
       ),
-    [points, donnee]
+    [points, donneeEffective]
+  );
+
+  // Interpoler une valeur vent sur un timestamp GPS a partir des cellules meteo
+  // Pour chaque point GPS, trouve la cellule correspondante (ou interpole entre deux)
+  const interpolerVentSurPoints = useCallback(
+    (champ: "ventVitesseKn" | "ventDirectionDeg"): DonneeGraphique[] => {
+      if (!cellulesMeteo || cellulesMeteo.length === 0) return [];
+
+      // Construire une timeline triee des valeurs vent (centre de chaque heure, dedup)
+      const timeline: { temps: number; valeur: number }[] = [];
+      const vus = new Set<number>();
+      for (const c of cellulesMeteo) {
+        const centre = Math.round(
+          (new Date(c.dateDebut).getTime() + new Date(c.dateFin).getTime()) / 2
+        );
+        if (!vus.has(centre)) {
+          vus.add(centre);
+          timeline.push({ temps: centre, valeur: c[champ] });
+        }
+      }
+      timeline.sort((a, b) => a.temps - b.temps);
+
+      if (timeline.length === 0) return [];
+
+      // Projeter chaque point GPS sur la timeline vent par interpolation lineaire
+      return sousechantillonner(
+        points
+          .filter((p) => p.timestamp != null)
+          .map((p, i) => {
+            const t = new Date(p.timestamp!).getTime();
+
+            // Avant le premier ou apres le dernier : valeur constante
+            if (t <= timeline[0].temps) {
+              return { temps: t, heure: p.timestamp!, valeur: timeline[0].valeur, pointIndex: p.pointIndex ?? i };
+            }
+            if (t >= timeline[timeline.length - 1].temps) {
+              return { temps: t, heure: p.timestamp!, valeur: timeline[timeline.length - 1].valeur, pointIndex: p.pointIndex ?? i };
+            }
+
+            // Trouver les deux points encadrants et interpoler
+            let j = 0;
+            while (j < timeline.length - 1 && timeline[j + 1].temps < t) j++;
+            const a = timeline[j];
+            const b = timeline[j + 1];
+            const ratio = (t - a.temps) / (b.temps - a.temps);
+            const valeur = a.valeur + ratio * (b.valeur - a.valeur);
+
+            return { temps: t, heure: p.timestamp!, valeur, pointIndex: p.pointIndex ?? i };
+          }),
+        500
+      );
+    },
+    [cellulesMeteo, points]
+  );
+
+  // Datasets vent interpoles sur les points GPS (meme timeline que vitesse/cap)
+  const donneesVent = useMemo(
+    () => interpolerVentSurPoints("ventVitesseKn"),
+    [interpolerVentSurPoints]
+  );
+
+  const donneesVentDir = useMemo(
+    () => interpolerVentSurPoints("ventDirectionDeg"),
+    [interpolerVentSurPoints]
   );
 
   useEffect(() => {
@@ -127,23 +217,48 @@ export default function TraceChart({
       clearTimeout(timer);
       resizeObs.disconnect();
     };
-  }, [donneesGraphique]);
+  }, [donneesGraphique, donneesVent, donneesVentDir]);
+
+  // Dataset actif selon le mode
+  const donneesActives = modeVentDirection ? donneesVentDir : modeVent ? donneesVent : donneesGraphique;
 
   // Plage temporelle
   const { tempsDebut, duree } = useMemo(() => {
-    if (donneesGraphique.length === 0) return { tempsDebut: 0, duree: 1 };
-    const debut = donneesGraphique[0].temps;
-    const fin = donneesGraphique[donneesGraphique.length - 1].temps;
+    if (donneesActives.length === 0) return { tempsDebut: 0, duree: 1 };
+    const debut = donneesActives[0].temps;
+    const fin = donneesActives[donneesActives.length - 1].temps;
     return { tempsDebut: debut, duree: fin - debut || 1 };
-  }, [donneesGraphique]);
+  }, [donneesActives]);
 
   // Position du thumb fixe en % — par temps (coherent avec l'axe numerique)
   const positionThumbFixe = useMemo(() => {
-    if (pointFixeIndex == null || donneesGraphique.length < 2) return null;
-    const d = donneesGraphique.find((d) => d.pointIndex === pointFixeIndex);
+    if (pointFixeIndex == null || donneesActives.length < 2) return null;
+    const d = donneesActives.find((d) => d.pointIndex === pointFixeIndex);
     if (!d) return null;
     return ((d.temps - tempsDebut) / duree) * 100;
-  }, [pointFixeIndex, donneesGraphique, tempsDebut, duree]);
+  }, [pointFixeIndex, donneesActives, tempsDebut, duree]);
+
+  // Position et contenu du tooltip actif (toujours nav + vent si dispo)
+  const tooltipActif = useMemo(() => {
+    if (pointActifIndex == null || donneesActives.length < 2) return null;
+    const d = donneesActives.find((d) => d.pointIndex === pointActifIndex);
+    if (!d) return null;
+    const pct = ((d.temps - tempsDebut) / duree) * 100;
+    const heure = format(new Date(d.temps), "HH:mm:ss");
+    const ts = new Date(d.temps).toISOString();
+
+    // Donnees nav
+    const pointGps = points.find((p) => p.timestamp && Math.abs(new Date(p.timestamp).getTime() - d.temps) < 5000);
+    const vitesse = pointGps?.speedKn ?? null;
+    const cap = pointGps?.headingDeg ?? null;
+
+    // Donnees vent
+    const cellule = cellulesMeteo?.length
+      ? trouverCelluleActive(cellulesMeteo, ts, pointGps?.lat ?? 0, pointGps?.lon ?? 0)
+      : null;
+
+    return { pct, heure, vitesse, cap, force: cellule ? Math.round(cellule.ventVitesseKn) : null, dir: cellule ? Math.round(cellule.ventDirectionDeg) : null };
+  }, [pointActifIndex, donneesActives, tempsDebut, duree, cellulesMeteo, points]);
 
   // Gradient toujours base sur la vitesse (lecture croisee)
   const donneesVitesse = useMemo(
@@ -173,9 +288,9 @@ export default function TraceChart({
 
   const tempsSurvole = useMemo(() => {
     if (pointActifIndex == null) return null;
-    const d = donneesGraphique.find((d) => d.pointIndex === pointActifIndex);
+    const d = donneesActives.find((d) => d.pointIndex === pointActifIndex);
     return d?.temps ?? null;
-  }, [pointActifIndex, donneesGraphique]);
+  }, [pointActifIndex, donneesActives]);
 
   // Ref pour capturer le dernier point survole (utilise par onClick)
   const dernierPointSurvoleRef = useRef<number | null>(null);
@@ -188,7 +303,7 @@ export default function TraceChart({
       if (state?.activePayload?.[0]?.payload?.pointIndex !== undefined) {
         idx = state.activePayload[0].payload.pointIndex;
       } else if (state?.activeLabel != null) {
-        const point = donneesGraphique.find(
+        const point = donneesActives.find(
           (d) => d.temps === state.activeLabel
         );
         if (point) idx = point.pointIndex;
@@ -198,7 +313,7 @@ export default function TraceChart({
         onHoverPoint(idx);
       }
     },
-    [onHoverPoint, donneesGraphique]
+    [onHoverPoint, donneesActives]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -213,11 +328,11 @@ export default function TraceChart({
   // Trouve le point le plus proche d'un ratio (0-1) sur la plage temporelle
   const trouverPointParRatio = useCallback(
     (ratio: number) => {
-      if (donneesGraphique.length === 0) return null;
+      if (donneesActives.length === 0) return null;
       const tempsCible = tempsDebut + ratio * duree;
-      let meilleur = donneesGraphique[0];
+      let meilleur = donneesActives[0];
       let meilleureDiff = Infinity;
-      for (const d of donneesGraphique) {
+      for (const d of donneesActives) {
         const diff = Math.abs(d.temps - tempsCible);
         if (diff < meilleureDiff) {
           meilleureDiff = diff;
@@ -226,7 +341,7 @@ export default function TraceChart({
       }
       return meilleur.pointIndex;
     },
-    [donneesGraphique, tempsDebut, duree]
+    [donneesActives, tempsDebut, duree]
   );
 
   // Drag du thumb slider — logique partagee mouse/touch
@@ -304,7 +419,7 @@ export default function TraceChart({
     [onHoverPoint, trouverPointParRatio, sliderStyle]
   );
 
-  if (donneesGraphique.length < 2) {
+  if (donneesActives.length < 2) {
     return (
       <div className="chart-empty">
         Pas assez de donnees pour afficher le graphique
@@ -313,17 +428,23 @@ export default function TraceChart({
   }
 
   const strokeId = "gradient-vitesse";
-  const stroke = `url(#${strokeId})`;
+
+  // Titre et formateur selon le mode
+  const configVentActif = modeVentDirection ? CONFIG_VENT_DIR : CONFIG_VENT;
+  const titreActif = modeVent ? configVentActif.titre : config.titre;
+  const formaterActif = modeVent ? configVentActif.formater : config.formater;
 
   return (
-    <div className="chart-container" ref={conteneurRef} onTouchStart={handleTouchChart}>
-      <h3 className="chart-title">{config.titre}</h3>
+    <div className={`chart-container${compact ? " chart-container--compact" : ""}`} ref={conteneurRef} onTouchStart={handleTouchChart}>
+      {!compact && <h3 className="chart-title">{titreActif}</h3>}
+      {compact && <span className="chart-title-compact">{titreActif}</span>}
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={donneesGraphique}
+          data={donneesActives}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={onClickPoint ? handleClick : undefined}
+          margin={compact ? { top: 4, right: 4, bottom: 0, left: 0 } : undefined}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COULEURS.grille} />
           <XAxis
@@ -332,28 +453,18 @@ export default function TraceChart({
             scale="time"
             domain={["dataMin", "dataMax"]}
             tickFormatter={(t) => format(new Date(t), "HH:mm")}
-            tick={{ fontSize: 11, fill: "#aaa" }}
-            stroke="#ccc"
+            tick={compact ? false : { fontSize: 11, fill: "#aaa" }}
+            stroke={compact ? "transparent" : "#ccc"}
+            height={compact ? 0 : undefined}
           />
           <YAxis
             tick={{ fontSize: 10, fill: "#aaa" }}
             stroke="#ccc"
             width={25}
-            domain={config.domaine}
+            domain={modeVent ? (modeVentDirection ? CONFIG_VENT_DIR.domaine : undefined) : config.domaine}
           />
-          <Tooltip
-            labelFormatter={(t) =>
-              format(new Date(t as number), "HH:mm:ss")
-            }
-            formatter={(value) => [config.formater(Number(value)), config.titre]}
-            contentStyle={{
-              backgroundColor: COULEURS.fond,
-              border: `1px solid ${COULEURS.bordure}`,
-              borderRadius: 8,
-              fontSize: 12,
-            }}
-          />
-          {gradientStops && (
+          <Tooltip content={() => null} />
+          {!modeVent && gradientStops && (
             <defs>
               <linearGradient id={strokeId} x1="0" y1="0" x2="1" y2="0">
                 {gradientStops.map((stop, i) => (
@@ -369,7 +480,7 @@ export default function TraceChart({
           <Line
             type="monotone"
             dataKey="valeur"
-            stroke={stroke}
+            stroke={modeVent ? "#43728B" : `url(#${strokeId})`}
             dot={false}
             strokeWidth={1.5}
           />
@@ -408,6 +519,35 @@ export default function TraceChart({
           </>
         )}
       </div>
+
+      {/* Tooltip custom — positionne via pointActifIndex, visible sur les deux graphs */}
+      {tooltipActif && (() => {
+        const ml = sliderStyle?.left ?? 30;
+        const mr = sliderStyle?.right ?? 5;
+        const cw = conteneurRef.current?.clientWidth ?? 0;
+        const px = ml + (tooltipActif.pct / 100) * (cw - ml - mr);
+        return (
+        <div
+          className="chart-tooltip-custom"
+          style={{ left: px }}
+        >
+          <div className="chart-tooltip-compact">
+            <span className="chart-tooltip-heure">{tooltipActif.heure}</span>
+            {modeVent ? (
+              <>
+                <span className="chart-tooltip-val"><Wind size={11} /> {tooltipActif.force ?? "—"} kn</span>
+                <span className="chart-tooltip-val"><Navigation2 size={11} /> {tooltipActif.dir ?? "—"}°</span>
+              </>
+            ) : (
+              <>
+                <span className="chart-tooltip-val"><Gauge size={11} /> {tooltipActif.vitesse != null ? `${tooltipActif.vitesse.toFixed(1)} kn` : "—"}</span>
+                <span className="chart-tooltip-val"><Compass size={11} /> {tooltipActif.cap != null ? `${Math.round(tooltipActif.cap)}°` : "—"}</span>
+              </>
+            )}
+          </div>
+        </div>
+        );
+      })()}
     </div>
   );
 }

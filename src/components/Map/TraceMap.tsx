@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MapGL, {
   Source,
   Layer,
@@ -12,17 +12,26 @@ import type { StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Layers, Map as MapIcon, Satellite, Ship, Plus, Minus, Compass, Gauge, Clock, MapPin } from "lucide-react";
+import { Layers, Map as MapIcon, Satellite, Ship, Plus, Minus, Compass, Wind, Gauge, Clock, MapPin } from "lucide-react";
 import EchelleCarte from "./EchelleCarte";
-import type { PointCarte } from "@/lib/types";
+import { trouverCelluleActive } from "@/lib/geo/stats-vent";
+import type { PointCarte, CelluleMeteoClient, StatsVent, DonneeGraphee } from "@/lib/types";
 
 interface PropsCarteTrace {
   points: PointCarte[];
   maxSpeed: number;
   paddingBottom?: number;
   pointActifIndex?: number | null;
+  pointFixeIndex?: number | null;
   onHoverPoint?: (pointIndex: number | null) => void;
   onClickPoint?: (pointIndex: number) => void;
+  cellulesMeteo?: CelluleMeteoClient[];
+  statsVent?: StatsVent | null;
+  donneeGraphee?: DonneeGraphee;
+  ventDeploye?: boolean;
+  donneeVentDeployee?: "vent" | "ventDirection";
+  onClickRoseDesVents?: () => void;
+  onBearingChange?: (bearing: number) => void;
 }
 
 import {
@@ -98,12 +107,16 @@ function formaterCoord(decimal: number, positif: string, negatif: string): strin
   return `${deg}°${String(min).padStart(2, "0")}'${String(milliemes).padStart(3, "0")}${signe}`;
 }
 
-export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointActifIndex, onHoverPoint, onClickPoint }: PropsCarteTrace) {
+export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointActifIndex, pointFixeIndex, onHoverPoint, onClickPoint, cellulesMeteo, statsVent, donneeGraphee, ventDeploye, donneeVentDeployee, onClickRoseDesVents, onBearingChange }: PropsCarteTrace) {
   const mapRef = useRef<MapRef>(null);
   const [fondCarte, setFondCarte] = useState<"osm" | "satellite">("osm");
   const [afficherSeaMap, setAfficherSeaMap] = useState(true);
   const [popupInfo, setPopupInfo] = useState<InfoPopup | null>(null);
   const [panneauCouchesOuvert, setPanneauCouchesOuvert] = useState(false);
+  const [modeOrientation, setModeOrientation] = useState<"nord" | "vent">("nord");
+  const [bearing, setBearing] = useState(0);
+  const bearingRef = useRef(0);
+  const [popoverBoussole, setPopoverBoussole] = useState(false);
 
   const limites = useMemo(() => {
     const lons = points.map((p) => p.lon);
@@ -261,6 +274,26 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
     return points.find((p) => p.pointIndex === pointActifIndex) ?? null;
   }, [points, pointActifIndex]);
 
+  // Cellule meteo active pour le point courant
+  const celluleActive = useMemo(() => {
+    if (!cellulesMeteo?.length || !pointActifData) return null;
+    return trouverCelluleActive(
+      cellulesMeteo,
+      pointActifData.timestamp,
+      pointActifData.lat,
+      pointActifData.lon
+    );
+  }, [cellulesMeteo, pointActifData]);
+
+  // Rotation dynamique de la carte quand le mode "vent" est actif
+  useEffect(() => {
+    if (modeOrientation !== "vent" || !celluleActive) return;
+    mapRef.current?.rotateTo(celluleActive.ventDirectionDeg, { duration: 500 });
+    bearingRef.current = celluleActive.ventDirectionDeg;
+    setBearing(celluleActive.ventDirectionDeg);
+    onBearingChange?.(celluleActive.ventDirectionDeg);
+  }, [modeOrientation, celluleActive?.ventDirectionDeg, onBearingChange]);
+
   if (points.length === 0) {
     return (
       <div className="map-loading">
@@ -282,8 +315,13 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
         onMouseMove={onHoverPoint ? handleMouseMove : undefined}
         onMouseLeave={onHoverPoint ? handleMouseLeave : undefined}
         interactiveLayerIds={["trace-segments"]}
+        pitchWithRotate={false}
+        touchPitch={false}
+        maxPitch={0}
         cursor="pointer"
         style={{ width: "100%", height: "100%" }}
+        onMove={(e) => { const b = e.viewState.bearing; if (Math.abs(b - bearingRef.current) > 1) { bearingRef.current = b; setBearing(b); onBearingChange?.(b); } }}
+        onRender={() => { const b = mapRef.current?.getBearing() ?? 0; if (Math.abs(b - bearingRef.current) > 1) { bearingRef.current = b; setBearing(b); onBearingChange?.(b); } }}
       >
         {/* Ligne continue avec gradient de couleur (rendu visuel) */}
         <Source
@@ -365,7 +403,7 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
             <div
               className="marqueur-directionnel"
               style={{
-                transform: `rotate(${pointActifData.headingDeg ?? 0}deg)`,
+                transform: `rotate(${(pointActifData.headingDeg ?? 0) - (mapRef.current?.getBearing() ?? 0)}deg)`,
               }}
             >
               <svg
@@ -387,32 +425,69 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
         )}
       </MapGL>
 
-      {/* Contrôles carte — boutons ronds en haut à droite */}
+      {/* Indicateur vent sur la carte — uniquement en mode vent (le vent vient d'en haut) */}
+      {statsVent && modeOrientation === "vent" && (
+        <div className="map-indicateur-vent">
+          <Wind size={60} />
+        </div>
+      )}
+
+      {/* Contrôles carte — selecteurs en haut à droite */}
       <div className="map-couches-btns">
-        <button
-          className="map-couche-btn"
-          onClick={() => mapRef.current?.getMap().zoomIn()}
-          title="Zoom avant"
-        >
-          <Plus style={{ width: 14, height: 14 }} />
-        </button>
-        <button
-          className="map-couche-btn"
-          onClick={() => mapRef.current?.getMap().zoomOut()}
-          title="Zoom arrière"
-        >
-          <Minus style={{ width: 14, height: 14 }} />
-        </button>
-        <button
-          className="map-couche-btn"
-          onClick={() => mapRef.current?.getMap().resetNorthPitch()}
-          title="Réinitialiser le nord"
-        >
-          <Compass style={{ width: 14, height: 14 }} />
-        </button>
+        {/* Orientation — selecteur style couches */}
+        <div style={{ position: "relative" }}>
+          <button
+            className={`map-couche-btn map-couche-btn--layers${modeOrientation === "vent" || Math.abs(bearing) > 1 ? " map-couche-btn--actif" : ""}`}
+            onClick={() => setPopoverBoussole((o) => !o)}
+            title="Orientation de la carte"
+          >
+            {modeOrientation === "vent"
+              ? <Wind style={{ width: 16, height: 16, transform: "rotate(90deg)" }} />
+              : <Compass style={{ width: 16, height: 16, transform: `rotate(${-bearing}deg)`, transition: "transform 0.3s" }} />
+            }
+          </button>
+
+          {popoverBoussole && (
+            <div className="map-couches-panneau">
+              <button
+                className={`map-couche-option${modeOrientation === "nord" ? " active" : ""}`}
+                onClick={() => {
+                  setModeOrientation("nord");
+                  mapRef.current?.resetNorthPitch();
+                  bearingRef.current = 0;
+                  setBearing(0);
+                  onBearingChange?.(0);
+                  setPopoverBoussole(false);
+                }}
+              >
+                <Compass style={{ width: 16, height: 16 }} />
+                Nord
+              </button>
+              <button
+                className={`map-couche-option${modeOrientation === "vent" ? " active" : ""}${!statsVent ? " map-couche-option--desactive" : ""}`}
+                onClick={() => {
+                  if (!statsVent) return;
+                  setModeOrientation("vent");
+                  mapRef.current?.rotateTo(
+                    celluleActive?.ventDirectionDeg ?? statsVent.directionMoyenneDeg,
+                    { duration: 500 }
+                  );
+                  setPopoverBoussole(false);
+                }}
+                disabled={!statsVent}
+                title={!statsVent ? "Aucune donnee meteo disponible" : "Orienter la carte face au vent"}
+              >
+                <Wind style={{ width: 16, height: 16 }} />
+                Vent archive
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="map-couche-spacer" />
 
+        {/* Couches — selecteur existant */}
+        <div style={{ position: "relative" }}>
         <button
           className="map-couche-btn map-couche-btn--layers"
           onClick={() => setPanneauCouchesOuvert((o) => !o)}
@@ -450,9 +525,29 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
             </button>
           </div>
         )}
+        </div>
       </div>
 
-      <EchelleCarte mapRef={mapRef} />
+      {/* Zoom + echelle — bas gauche */}
+      <div className="map-bas-gauche">
+        <div className="map-zoom-pill">
+          <button
+            className="map-zoom-btn"
+            onClick={() => mapRef.current?.getMap().zoomIn()}
+            title="Zoom avant"
+          >
+            <Plus style={{ width: 14, height: 14 }} />
+          </button>
+          <button
+            className="map-zoom-btn"
+            onClick={() => mapRef.current?.getMap().zoomOut()}
+            title="Zoom arriere"
+          >
+            <Minus style={{ width: 14, height: 14 }} />
+          </button>
+        </div>
+        <EchelleCarte mapRef={mapRef} />
+      </div>
     </div>
   );
 }

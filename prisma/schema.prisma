@@ -99,6 +99,7 @@ model Trace {
   bateau          Bateau?      @relation(fields: [bateauId], references: [id], onDelete: SetNull)
   polylineSimplifiee Json?
   points             TrackPoint[]
+  cellulesMeteo      CelluleMeteo[]
   navigation         Navigation?
 
   @@index([userId])
@@ -120,6 +121,24 @@ model TrackPoint {
 
   @@index([traceId])
   @@index([traceId, isExcluded])
+}
+
+model CelluleMeteo {
+  id               String   @id @default(cuid())
+  traceId          String
+  trace            Trace    @relation(fields: [traceId], references: [id], onDelete: Cascade)
+  latitude         Float
+  longitude        Float
+  dateDebut        DateTime
+  dateFin          DateTime
+  ventVitesseKn    Float
+  ventRafalesKn    Float
+  ventDirectionDeg Float
+  source           String   @default("open-meteo-archive")
+  resolution       String   @default("25km/1h")
+
+  @@unique([traceId, latitude, longitude, dateDebut])
+  @@index([traceId])
 }
 
 // === Journal de bord ===
