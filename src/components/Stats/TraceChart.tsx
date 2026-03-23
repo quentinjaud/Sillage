@@ -95,6 +95,7 @@ export default function TraceChart({
   // Mode vent actif si donnee === "vent" ou "ventDirection" ET des cellules sont disponibles
   const modeVent = (donnee === "vent" || donnee === "ventDirection") && (cellulesMeteo?.length ?? 0) > 0;
   const modeVentDirection = donnee === "ventDirection" && (cellulesMeteo?.length ?? 0) > 0;
+  const modeTWA = donnee === "twa";
 
   // Pour les modes vitesse/cap, repli sur vitesse si vent sans cellules
   const donneeEffective: Exclude<DonneeGraphee, "vent" | "ventDirection" | "twa"> =
@@ -183,6 +184,21 @@ export default function TraceChart({
     [cellulesMeteo, points]
   );
 
+  const interpolerCapSurPoints = useCallback((): (number | null)[] => {
+    const caps = points.map((p) => p.headingDeg);
+    for (let i = 0; i < caps.length; i++) {
+      if (caps[i] != null) continue;
+      let gauche = i - 1;
+      while (gauche >= 0 && caps[gauche] == null) gauche--;
+      let droite = i + 1;
+      while (droite < caps.length && caps[droite] == null) droite++;
+      if (gauche < 0 || droite >= caps.length) continue;
+      const ratio = (i - gauche) / (droite - gauche);
+      caps[i] = interpolerCirculaire(caps[gauche]!, caps[droite]!, ratio);
+    }
+    return caps;
+  }, [points]);
+
   // Datasets vent interpoles sur les points GPS (meme timeline que vitesse/cap)
   const donneesVent = useMemo(
     () => interpolerVentSurPoints("ventVitesseKn"),
@@ -193,6 +209,33 @@ export default function TraceChart({
     () => interpolerVentSurPoints("ventDirectionDeg"),
     [interpolerVentSurPoints]
   );
+
+  const donneesTWA = useMemo(() => {
+    if (!modeTWA || !cellulesMeteo?.length) return [];
+    const ventDirs = interpolerVentSurPoints("ventDirectionDeg");
+    if (!ventDirs.length) return [];
+    const caps = interpolerCapSurPoints();
+    const ventParIndex = new Map(ventDirs.map((v) => [v.pointIndex, v.valeur]));
+
+    return sousechantillonner(
+      points
+        .filter((p) => p.timestamp != null)
+        .map((p, i) => {
+          const idx = p.pointIndex ?? i;
+          const cap = caps[i];
+          const ventDir = ventParIndex.get(idx);
+          if (cap == null || ventDir == null) return null;
+          return {
+            temps: new Date(p.timestamp!).getTime(),
+            heure: p.timestamp!,
+            valeur: calculerTWA(cap, ventDir),
+            pointIndex: idx,
+          };
+        })
+        .filter((d): d is NonNullable<typeof d> => d != null),
+      500
+    );
+  }, [modeTWA, cellulesMeteo, points, interpolerVentSurPoints, interpolerCapSurPoints]);
 
   useEffect(() => {
     const el = conteneurRef.current;
@@ -220,10 +263,10 @@ export default function TraceChart({
       clearTimeout(timer);
       resizeObs.disconnect();
     };
-  }, [donneesGraphique, donneesVent, donneesVentDir]);
+  }, [donneesGraphique, donneesVent, donneesVentDir, donneesTWA]);
 
   // Dataset actif selon le mode
-  const donneesActives = modeVentDirection ? donneesVentDir : modeVent ? donneesVent : donneesGraphique;
+  const donneesActives = modeTWA ? donneesTWA : modeVentDirection ? donneesVentDir : modeVent ? donneesVent : donneesGraphique;
 
   // Plage temporelle
   const { tempsDebut, duree } = useMemo(() => {
@@ -260,7 +303,12 @@ export default function TraceChart({
       ? trouverCelluleActive(cellulesMeteo, ts, pointGps?.lat ?? 0, pointGps?.lon ?? 0)
       : null;
 
-    return { pct, heure, vitesse, cap, force: cellule ? Math.round(cellule.ventVitesseKn) : null, dir: cellule ? Math.round(cellule.ventDirectionDeg) : null };
+    // Donnees TWA
+    const twa = (cap != null && cellule)
+      ? calculerTWA(cap, cellule.ventDirectionDeg)
+      : null;
+
+    return { pct, heure, vitesse, cap, force: cellule ? Math.round(cellule.ventVitesseKn) : null, dir: cellule ? Math.round(cellule.ventDirectionDeg) : null, twa };
   }, [pointActifIndex, donneesActives, tempsDebut, duree, cellulesMeteo, points]);
 
   // Gradient toujours base sur la vitesse (lecture croisee)
@@ -434,8 +482,8 @@ export default function TraceChart({
 
   // Titre et formateur selon le mode
   const configVentActif = modeVentDirection ? CONFIG_VENT_DIR : CONFIG_VENT;
-  const titreActif = modeVent ? configVentActif.titre : config.titre;
-  const formaterActif = modeVent ? configVentActif.formater : config.formater;
+  const titreActif = modeTWA ? "TWA" : modeVent ? configVentActif.titre : config.titre;
+  const formaterActif = modeTWA ? ((v: number) => `${Math.round(v)}°`) : modeVent ? configVentActif.formater : config.formater;
 
   return (
     <div className={`chart-container${compact ? " chart-container--compact" : ""}`} ref={conteneurRef} onTouchStart={handleTouchChart}>
@@ -464,7 +512,8 @@ export default function TraceChart({
             tick={{ fontSize: 10, fill: "#aaa" }}
             stroke="#ccc"
             width={25}
-            domain={modeVent ? (modeVentDirection ? CONFIG_VENT_DIR.domaine : undefined) : config.domaine}
+            domain={modeTWA ? [-180, 180] : modeVent ? (modeVentDirection ? CONFIG_VENT_DIR.domaine : undefined) : config.domaine}
+            ticks={modeTWA ? [-180, -90, 0, 90, 180] : undefined}
           />
           <Tooltip content={() => null} />
           {!modeVent && gradientStops && (
@@ -536,7 +585,17 @@ export default function TraceChart({
         >
           <div className="chart-tooltip-compact">
             <span className="chart-tooltip-heure">{tooltipActif.heure}</span>
-            {modeVent ? (
+            {modeTWA ? (
+              <>
+                <span className="chart-tooltip-val">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M21 19c.552 0 1.005-.449.95-.998a10 10 0 0 0-19.9 0c-.055.55.398.998.95.998.552 0 .994-.45 1.062-.997a8 8 0 0 1 15.876 0c.069.547.51.997 1.062.997Z"/>
+                  </svg>
+                  {" "}{tooltipActif.twa != null ? `${Math.abs(Math.round(tooltipActif.twa))}° ${bordTWA(tooltipActif.twa)}` : "—"}
+                </span>
+                <span className="chart-tooltip-val"><Gauge size={11} /> {tooltipActif.vitesse != null ? `${tooltipActif.vitesse.toFixed(1)} kn` : "—"}</span>
+              </>
+            ) : modeVent ? (
               <>
                 <span className="chart-tooltip-val"><Wind size={11} /> {tooltipActif.force ?? "—"} kn</span>
                 <span className="chart-tooltip-val"><Navigation2 size={11} /> {tooltipActif.dir ?? "—"}°</span>
