@@ -1,5 +1,81 @@
 # Sillage — Changelog
 
+## v0.5.1 — Icone app, TWA, polish UI (2026-03-24)
+
+### Icone app
+- Favicon SVG degrade bleu-rouge-jaune (line-squiggle de Lucide)
+- Icone dans le header principal avec contour blanc sur fond bleu
+- Icone squiggle decorative sur les panneaux stats (trace et navigation)
+
+### TWA (True Wind Angle)
+- Calcul TWA a partir du cap GPS et du vent Open-Meteo (`src/lib/geo/twa.ts`)
+- Interpolation circulaire pour cap et direction vent (correction du bug lineaire)
+- Pill TWA dans PanneauPointActif : icone composee bateau+vent avec decoupe mask
+- Graphique TWA : domaine [-180, +180], zero au centre, courbe coloree par vitesse
+- Tooltip unifie : toujours vitesse + cap + TWA, donnee chartee en bold (+200 font-weight)
+- Tooltip vent (HUD compact) : force + direction seulement, sans heure
+
+### Icone TWA
+- Composant `IconeTWA` reutilisable : bateau ChartedSails decoupe par le vent Lucide via SVG mask
+- Rotation +45° pour un rendu equilibre
+- Utilisee dans la pill et le tooltip
+
+### Panneau controle carte
+- Boussole, couches et zoom fusionnes en une seule pill verticale
+- Hover et etat actif clippes par border-radius individuel
+- Bouton retour Journal repositionne a droite du panneau stats
+
+### Pills et labels
+- Data-labels (POS, DATE, VIT, CAP, TWA) sur chaque pill, style jaune accent
+- Largeurs fixes (min-width) pour eviter les sauts au slide
+- Valeurs paddees avec figure-space + tabular-nums
+- Font-weight +200 sur la pill active
+- Labels de graphiques (Vitesse, TWA, Vent) en style pill jaune
+
+### Echelle carte
+- Correction du calcul : arrondi vers le bas (la barre changeait pas de taille)
+
+### Tooltip graphique
+- Position fluide : translateX interpole lineairement de 0% a -100% selon la position
+
+### Layout tablette (< 1080px)
+- Panneau stats : polices reduites, breadcrumb tronque ("... > Aventure")
+- Echelle masquee
+- Onglets (vent, rose des vents) colles au graphique sans border-radius bas
+- "Sup. meteo" au lieu de "Supprimer meteo", resolution masquee
+
+### Corrections
+- Date navigation : affiche la date du premier point GPS (pas la date de creation)
+- Coordonnees : correction arrondi milliemes (1000 → propagation retenue)
+- "kt" remplace "kn" partout pour l'abreviation des noeuds
+- Ligne vent en blanc (meilleur contraste sur fond sombre du HUD)
+- Intercaractere date reduit (-0.3px desktop, -0.5px tablette)
+- Icone bateau inclinee 30° a cote du nom du bateau
+
+## v0.5.0 — Enrichissement vent Open-Meteo (2026-03-23)
+
+### Donnees vent
+- Integration Open-Meteo Archive API (modele AROME France, 2.5km/1h)
+- Cellules meteo stockees en base (Prisma), liees a la trace
+- Stats vent calculees : moyenne, rafales max, direction moyenne circulaire, variation
+- Filtrage temporel des cellules sur la plage de navigation
+
+### HUD vent
+- Rose des vents compacte (repliee) : icone vent orientee, force en kt
+- HUD deploye : graphique Recharts compact (vent ou direction), basculable
+- Selecteur mode vent/direction dans le HUD deploye
+- Zoom et echelle remontent quand le HUD est deploye
+
+### Controles carte
+- Orientation carte : mode Nord (defaut) et mode Vent (oriente face au vent archive)
+- Selecteur fond de carte : OSM, Satellite, SeaMap
+- Indicateur vent semi-transparent sur la carte
+
+### Tooltips synchronises
+- Tooltips compacts sur graphique principal et HUD vent, avec double donnee
+- Icones Lucide dans les tooltips (remplacement des emojis)
+- Synchronisation curseur entre les deux graphiques
+
 ## v0.4.1 — Phase 3b : Vue navigation immersive (2026-03-22)
 
 ### Vue immersive

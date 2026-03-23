@@ -57,7 +57,7 @@ export default function PanneauPointActif({
         data-label="VIT"
       >
         <Gauge className="point-actif-pill-icon" />
-        {pointActif.speedKn != null ? pointActif.speedKn.toFixed(1).padStart(4, "\u2007") : "\u2007\u2014\u2007"} kn
+        {pointActif.speedKn != null ? pointActif.speedKn.toFixed(1).padStart(4, "\u2007") : "\u2007\u2014\u2007"} kt
       </button>
 
       {/* Cap — cliquable pour switch */}

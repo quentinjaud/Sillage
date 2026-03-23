@@ -127,14 +127,14 @@ export default function PanneauStats({
           </span>
           <span className="stats-val-reduite" title="Vitesse moyenne">
             <Gauge size={12} />
-            {avgSpeedKn?.toFixed(1) ?? "—"}<small>kn</small>
+            {avgSpeedKn?.toFixed(1) ?? "—"}<small>kt</small>
           </span>
         </div>
         {statsVent && (
           <div className="stats-ligne-reduite stats-ligne-reduite--vent">
             <span className="stats-val-reduite" title="Vent moyen">
               <Wind size={12} />
-              {Math.round(statsVent.ventMoyenKn)}<sup>{Math.round(statsVent.rafalesMaxKn)}</sup><small>kn</small>
+              {Math.round(statsVent.ventMoyenKn)}<sup>{Math.round(statsVent.rafalesMaxKn)}</sup><small>kt</small>
             </span>
             <span className="stats-val-reduite stats-val-reduite--droite" title="Direction moyenne">
               <Navigation size={12} />
@@ -181,13 +181,13 @@ export default function PanneauStats({
         icon={Gauge}
         etiquette="V. moy."
         valeur={avgSpeedKn?.toFixed(1) ?? "—"}
-        unite="kn"
+        unite="kt"
       />
       <LigneStat
         icon={Navigation}
         etiquette="V. max"
         valeur={maxSpeedKn?.toFixed(1) ?? "—"}
-        unite="kn"
+        unite="kt"
       />
 
       {statsVent ? (
@@ -197,13 +197,13 @@ export default function PanneauStats({
             icon={Wind}
             etiquette="Vent moy."
             valeur={Math.round(statsVent.ventMoyenKn).toString()}
-            unite="kn"
+            unite="kt"
           />
           <LigneStat
             icon={Zap}
             etiquette="Rafales"
             valeur={Math.round(statsVent.rafalesMaxKn).toString()}
-            unite="kn"
+            unite="kt"
           />
           <LigneStat
             icon={Navigation}

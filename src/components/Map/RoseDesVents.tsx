@@ -33,7 +33,7 @@ export default function RoseDesVents({
       <button
         className="rose-des-vents"
         onClick={onClick}
-        title={`Vent ${Math.round(vitesseKn)} kn — ${Math.round(directionDeg)}° — cliquer pour deployer`}
+        title={`Vent ${Math.round(vitesseKn)} kt — ${Math.round(directionDeg)}° — cliquer pour deployer`}
       >
         <div className="rose-des-vents-rose">
           {/* Cercle + cardinaux */}
@@ -67,7 +67,7 @@ export default function RoseDesVents({
           })()}
         </div>
         <div className="rose-des-vents-vitesse">
-          {Math.round(vitesseKn)} <span className="rose-des-vents-unite">kn</span>
+          {Math.round(vitesseKn)} <span className="rose-des-vents-unite">kt</span>
         </div>
       </button>
     );

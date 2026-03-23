@@ -138,7 +138,7 @@ export default function GraphiqueNettoyage({
           stroke={COULEURS.texteSecondaire}
           width={35}
           label={{
-            value: "kn",
+            value: "kt",
             angle: -90,
             position: "insideLeft",
             style: { fontSize: 10 },
@@ -146,7 +146,7 @@ export default function GraphiqueNettoyage({
         />
         <Tooltip
           labelFormatter={(t) => format(new Date(t as string), "HH:mm:ss")}
-          formatter={(value) => [`${Number(value).toFixed(1)} kn`, "Vitesse"]}
+          formatter={(value) => [`${Number(value).toFixed(1)} kt`, "Vitesse"]}
           contentStyle={{
             backgroundColor: "rgba(255,253,249,0.95)",
             border: `1px solid ${COULEURS.bordure}`,

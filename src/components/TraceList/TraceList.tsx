@@ -171,7 +171,7 @@ export default function TraceList({ traces, bateaux = [] }: PropsListeTraces) {
                     <span>{formaterDuree(trace.durationSeconds)}</span>
                   )}
                   {trace.avgSpeedKn && (
-                    <span>{trace.avgSpeedKn.toFixed(1)} kn moy.</span>
+                    <span>{trace.avgSpeedKn.toFixed(1)} kt moy.</span>
                   )}
                 </div>
               </div>

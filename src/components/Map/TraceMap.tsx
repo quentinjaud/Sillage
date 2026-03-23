@@ -380,7 +380,7 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
               <div className="map-popup-donnees">
                 <span className="map-popup-donnee">
                   <Gauge style={{ width: 12, height: 12 }} />
-                  {popupInfo.vitesse.toFixed(1)} kn
+                  {popupInfo.vitesse.toFixed(1)} kt
                 </span>
                 {popupInfo.cap !== null && (
                   <span className="map-popup-donnee">

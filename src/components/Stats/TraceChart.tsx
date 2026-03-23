@@ -48,8 +48,8 @@ const CONFIG_DONNEES: Record<
   vitesse: {
     titre: "Vitesse",
     cle: "speedKn",
-    unite: "kn",
-    formater: (v) => `${v.toFixed(1)} kn`,
+    unite: "kt",
+    formater: (v) => `${v.toFixed(1)} kt`,
   },
   cap: {
     titre: "Cap GPS",
@@ -72,8 +72,8 @@ const MARGE_DROITE_PLOT = 5;
 
 const CONFIG_VENT = {
   titre: "Vent",
-  unite: "kn",
-  formater: (v: number) => `${v.toFixed(1)} kn`,
+  unite: "kt",
+  formater: (v: number) => `${v.toFixed(1)} kt`,
 };
 
 const CONFIG_VENT_DIR = {
@@ -533,7 +533,7 @@ export default function TraceChart({
           <Line
             type="monotone"
             dataKey="valeur"
-            stroke={modeVent ? "#43728B" : `url(#${strokeId})`}
+            stroke={modeVent ? "white" : `url(#${strokeId})`}
             dot={false}
             strokeWidth={1.5}
           />
@@ -593,7 +593,7 @@ export default function TraceChart({
               <>
                 {tooltipActif.force != null && (
                   <span className="chart-tooltip-val" style={donnee === "vent" ? { fontWeight: 600 } : undefined}>
-                    <Wind size={11} /> {tooltipActif.force} kn
+                    <Wind size={11} /> {tooltipActif.force} kt
                   </span>
                 )}
                 {tooltipActif.dir != null && (
@@ -605,7 +605,7 @@ export default function TraceChart({
             ) : (
               <>
                 <span className="chart-tooltip-val" style={donnee === "vitesse" ? { fontWeight: 600 } : undefined}>
-                  <Gauge size={11} /> {tooltipActif.vitesse != null ? `${tooltipActif.vitesse.toFixed(1).padStart(4, "\u2007")} kn` : "\u2007\u2014\u2007"}
+                  <Gauge size={11} /> {tooltipActif.vitesse != null ? `${tooltipActif.vitesse.toFixed(1).padStart(4, "\u2007")} kt` : "\u2007\u2014\u2007"}
                 </span>
                 <span className="chart-tooltip-val" style={donnee === "cap" ? { fontWeight: 600 } : undefined}>
                   <Compass size={11} /> {tooltipActif.cap != null ? `${String(Math.round(tooltipActif.cap)).padStart(3, "\u2007")}°` : "\u2007\u2014\u2007"}

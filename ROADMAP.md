@@ -114,7 +114,17 @@ User
 - [ ] Panneau stats enrichi : stats globales + point actif, switch donnee graphee au clic
 - [ ] Mode edition metadonnees (nom, date, type) depuis la vue navigation
 
-## Phase 3c — Entrees journal (v0.4.x)
+## Phase 3c — Zoom temporel (v0.4.x)
+
+- [ ] Curseurs de selection de plage temporelle sur le graphique (deux poignees draggables)
+- [ ] Filtrage de la trace carte : n'afficher que le segment correspondant a la plage selectionnee
+- [ ] Graphiques recharges sur la plage zoomee : echelle affinee, plus de precision sur les donnees (vitesse, cap, etc.)
+- [ ] Zoom carte automatique : recentrer/rezoom sur le segment visible
+- [ ] Affichage de la plage selectionnee (heure debut → heure fin, duree) dans le HUD
+- [ ] Reset rapide : double-clic ou bouton pour revenir a la trace complete
+- [ ] Interaction fluide : drag des curseurs avec apercu en temps reel sur carte et graphiques
+
+## Phase 3d — Entrees journal (v0.4.x)
 
 - [ ] Entrees journal : notes texte + photos geolocalisees
 - [ ] Storage photos : Railway Storage Buckets (S3-compatible)
@@ -132,6 +142,7 @@ User
 - [ ] Affichage legs sur la timeline (bandes colorées)
 - [ ] Stats par leg + graphique VMG/temps
 - [ ] Affichage vent sur la carte
+- [ ] HUD vent : source de donnees configurable — pointActif (prioritaire si curseur actif) ou centreCarte (fallback, interpole le vent au centre de la vue carte). Important pour grands parcours ou le vent varie spatialement et temporellement
 
 ## Phase 5 — Mode régate & multi-bateaux (v0.6)
 
@@ -146,6 +157,7 @@ User
 
 - [ ] Diagramme polaire (vitesse vs angle de vent)
 - [ ] Polaires théoriques : import manuel (fichier .pol / CSV) + éditeur intégré
+- [ ] Import polaires depuis NavimetriX : reverse-engineer l'app Windows pour localiser les fichiers polaires (sur macOS : `~/Library/Application Support/Soft4Sail/NavimetriX/polars/`). NavimetriX prevoit un module polaires en T2 2026 — anticiper la compatibilite
 - [ ] Ratio performance réelle / polaire théorique
 - [ ] Création de parcours : placement de marques/bouées
 - [ ] Association parcours → navigation régate
@@ -163,6 +175,18 @@ User
 - [ ] Addon Navimetrix : streamer a la demande les traces + logs NMEA nouveaux depuis le dernier envoi, directement dans le compte de l'utilisateur sur Sillage
 - [ ] Synchronisation incrementale (delta depuis le dernier sync)
 - [ ] Import direct dans le journal de bord (creation automatique de navigations)
+
+---
+
+## Outils carte (backlog)
+
+- [ ] **Outil mesure de distances** (inspiration Géovoile)
+  - Placement de waypoints sur la carte → calcul distance totale + par segment
+  - **Routes orthodromiques** (great circle) pour les grandes distances — pas de ligne droite Mercator
+  - Affichage cap initial + cap final de chaque segment
+  - HUD avec distance totale, segments, caps
+  - Mode snap optionnel sur la trace existante
+- [ ] Inspiration générale **Géovoile** pour les outils cartographiques interactifs
 
 ---
 

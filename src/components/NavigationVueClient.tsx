@@ -311,7 +311,7 @@ export default function NavigationVueClient({
             <>
               <div className="hud-vent-deploye">
                 <span className="hud-vent-deploye-titre">
-                  {donneeVentDeployee === "vent" ? "Vent (kn)" : "Direction vent (°)"}
+                  {donneeVentDeployee === "vent" ? "Vent (kt)" : "Direction vent (°)"}
                 </span>
                 <div className="hud-vent-deploye-graphique">
                   <TraceChart
