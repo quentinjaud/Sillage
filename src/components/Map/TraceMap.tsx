@@ -414,28 +414,8 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
         )}
       </MapGL>
 
-      {/* Contrôles carte — en haut à droite */}
+      {/* Contrôles carte — selecteurs en haut à droite */}
       <div className="map-couches-btns">
-        {/* Zoom +/- en pill */}
-        <div className="map-zoom-pill">
-          <button
-            className="map-zoom-btn"
-            onClick={() => mapRef.current?.getMap().zoomIn()}
-            title="Zoom avant"
-          >
-            <Plus style={{ width: 14, height: 14 }} />
-          </button>
-          <button
-            className="map-zoom-btn"
-            onClick={() => mapRef.current?.getMap().zoomOut()}
-            title="Zoom arriere"
-          >
-            <Minus style={{ width: 14, height: 14 }} />
-          </button>
-        </div>
-
-        <div className="map-couche-spacer" />
-
         {/* Orientation — selecteur style couches */}
         <div style={{ position: "relative" }}>
           <button
@@ -522,7 +502,26 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
         )}
       </div>
 
-      <EchelleCarte mapRef={mapRef} />
+      {/* Echelle + zoom — bas gauche */}
+      <div className="map-bas-gauche">
+        <EchelleCarte mapRef={mapRef} />
+        <div className="map-zoom-pill">
+          <button
+            className="map-zoom-btn"
+            onClick={() => mapRef.current?.getMap().zoomIn()}
+            title="Zoom avant"
+          >
+            <Plus style={{ width: 14, height: 14 }} />
+          </button>
+          <button
+            className="map-zoom-btn"
+            onClick={() => mapRef.current?.getMap().zoomOut()}
+            title="Zoom arriere"
+          >
+            <Minus style={{ width: 14, height: 14 }} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

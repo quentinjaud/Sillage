@@ -1990,11 +1990,23 @@ body:has(.nettoyage-layout) .app-main {
 }
 
 /* Échelle carte custom — collée juste au-dessus du graphique */
-.echelle-carte {
+/* Conteneur bas gauche : echelle + zoom */
+.map-bas-gauche {
   position: absolute;
   bottom: calc(var(--hauteur-graphique, 230px) - 20px);
   left: 16px;
   z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Echelle carte : remonter quand HUD vent deploye */
+.map-wrapper:has(.hud-vent-deploye) .map-bas-gauche {
+  bottom: calc(var(--hauteur-graphique, 230px) + 96px);
+}
+
+.echelle-carte {
   display: flex;
   align-items: center;
   gap: 6px;
