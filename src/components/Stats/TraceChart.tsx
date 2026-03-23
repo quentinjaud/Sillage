@@ -34,7 +34,7 @@ interface PropsTraceChart {
 }
 
 const CONFIG_DONNEES: Record<
-  Exclude<DonneeGraphee, "vent" | "ventDirection">,
+  Exclude<DonneeGraphee, "vent" | "ventDirection" | "twa">,
   {
     titre: string;
     cle: keyof PointCarte;
@@ -96,8 +96,8 @@ export default function TraceChart({
   const modeVentDirection = donnee === "ventDirection" && (cellulesMeteo?.length ?? 0) > 0;
 
   // Pour les modes vitesse/cap, repli sur vitesse si vent sans cellules
-  const donneeEffective: Exclude<DonneeGraphee, "vent" | "ventDirection"> =
-    (donnee === "vent" || donnee === "ventDirection") ? "vitesse" : donnee;
+  const donneeEffective: Exclude<DonneeGraphee, "vent" | "ventDirection" | "twa"> =
+    (donnee === "vent" || donnee === "ventDirection" || donnee === "twa") ? "vitesse" : donnee;
   const config = CONFIG_DONNEES[donneeEffective];
   const conteneurRef = useRef<HTMLDivElement>(null);
 

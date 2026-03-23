@@ -137,7 +137,7 @@ export interface StatsVent {
 }
 
 /** Donnee affichee dans le graphique — extensible pour NMEA futur */
-export type DonneeGraphee = "vitesse" | "cap" | "vent" | "ventDirection";
+export type DonneeGraphee = "vitesse" | "cap" | "vent" | "ventDirection" | "twa";
 
 // === Journal de bord ===
 
