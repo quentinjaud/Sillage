@@ -10,12 +10,15 @@ function metresParPixel(lat: number, zoom: number): number {
   return (Math.cos((lat * Math.PI) / 180) * 40075016.686) / Math.pow(2, zoom + 8);
 }
 
+/** Plus grand palier <= valeur (arrondi vers le bas pour rester dans la largeur max) */
 function valeurPropre(valeur: number): number {
   const paliers = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+  let result = paliers[0];
   for (const p of paliers) {
-    if (p >= valeur) return p;
+    if (p <= valeur) result = p;
+    else break;
   }
-  return Math.ceil(valeur / 1000) * 1000;
+  return result;
 }
 
 interface PropsEchelle {

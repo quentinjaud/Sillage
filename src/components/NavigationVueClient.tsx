@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import TraceMapWrapper from "@/components/Map/TraceMapWrapper";
 import TraceChart from "@/components/Stats/TraceChart";
@@ -69,6 +71,7 @@ export default function NavigationVueClient({
   const [nomEdite, setNomEdite] = useState(nom);
   const [enEditionNom, setEnEditionNom] = useState(false);
   const [dateEditee, setDateEditee] = useState(date.slice(0, 10));
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setNomEdite(nom);
@@ -162,8 +165,8 @@ export default function NavigationVueClient({
 
   return (
     <div style={{ "--hauteur-graphique": `${paddingBas}px` } as React.CSSProperties}>
-      {/* Panneau stats + metadonnees navigation */}
-      <div className="trace-vue-stats">
+      {/* Squiggle + breadcrumb + panneau stats */}
+      <div className="trace-vue-stats-wrapper">
         <svg className="trace-vue-squiggle" width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <defs>
             <linearGradient id="sq-grad" x1="0" y1="0" x2="1" y2="1">
@@ -177,9 +180,19 @@ export default function NavigationVueClient({
           <path d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2" stroke="url(#sq-grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <div className="navigation-breadcrumb-flottant" style={statsReduit ? { display: "none" } : undefined}>
-          {breadcrumb}
-        </div>
+        {!statsReduit && (
+          <div className="navigation-breadcrumb-flottant">
+            {breadcrumb.includes(" > ") ? (
+              <>
+                <span className="breadcrumb-dossier">{breadcrumb.split(" > ")[0]}</span>
+                <span className="breadcrumb-ellipsis">...</span>
+                {" > "}
+                {breadcrumb.split(" > ").slice(1).join(" > ")}
+              </>
+            ) : breadcrumb}
+          </div>
+        )}
+        <div className="trace-vue-stats">
         <div className="navigation-meta">
           {enEditionNom ? (
             <input
@@ -209,15 +222,23 @@ export default function NavigationVueClient({
             </h2>
           )}
           <div className="navigation-meta-details" style={statsReduit ? { display: "none" } : undefined}>
+            <span
+              className="navigation-date-texte"
+              onClick={() => dateInputRef.current?.showPicker()}
+            >
+              {dateEditee ? format(new Date(dateEditee), "dd/MM/yyyy", { locale: fr }) : "—"}
+            </span>
             <input
+              ref={dateInputRef}
               type="date"
-              className="navigation-date-input"
+              className="navigation-date-input-hidden"
               value={dateEditee}
               onChange={handleChangeDate}
+              tabIndex={-1}
             />
             {bateau && (
               <div className="navigation-bateau">
-                <svg width="10" height="16" viewBox="0 0 12 22" fill="none">
+                <svg width="10" height="16" viewBox="0 0 12 22" fill="none" style={{ transform: "rotate(30deg)" }}>
                   <path d="M6 0 Q12 8 11 16 L10 20 L2 20 L1 16 Q0 8 6 0 Z" fill="#F6BC00" stroke="white" strokeWidth="1" />
                 </svg>
                 <span style={{ color: "#F6BC00" }}>{bateau.nom}</span>
@@ -244,6 +265,7 @@ export default function NavigationVueClient({
           onMeteoSupprimee={handleMeteoSupprimee}
           onReduitChange={setStatsReduit}
         />
+      </div>
       </div>
 
       {pointActif && (

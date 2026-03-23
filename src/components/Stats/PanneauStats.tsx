@@ -218,13 +218,13 @@ export default function PanneauStats({
             unite="°"
           />
           <div className="stats-vent-source">
-            <span>AROME France · 2.5km/1h</span>
+            <span>AROME France</span>
             <button
               className="stats-vent-supprimer"
               onClick={supprimerMeteo}
               type="button"
             >
-              Supprimer meteo
+              Sup. meteo
             </button>
           </div>
         </div>

@@ -108,7 +108,7 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
         <NavigationVueClient
           navigationId={navigation.id}
           nom={navigation.nom}
-          date={navigation.date.toISOString()}
+          date={(premierTs ?? navigation.date).toISOString()}
           type={navigation.type}
           bateau={trace.bateau}
           breadcrumb={`${navigation.dossier.nom}${navigation.aventure ? ` > ${navigation.aventure.nom}` : ""}`}

@@ -579,10 +579,13 @@ export default function TraceChart({
         const mr = sliderStyle?.right ?? 5;
         const cw = conteneurRef.current?.clientWidth ?? 0;
         const px = ml + (tooltipActif.pct / 100) * (cw - ml - mr);
+        // Interpoler le translateX de 0% (bord gauche) a -100% (bord droit)
+        const ratio = cw > 0 ? px / cw : 0.5;
+        const translateX = -(ratio * 100);
         return (
         <div
           className="chart-tooltip-custom"
-          style={{ left: px }}
+          style={{ left: px, transform: `translateX(${translateX}%)` }}
         >
           <div className="chart-tooltip-compact">
             <span className="chart-tooltip-heure">{tooltipActif.heure}</span>

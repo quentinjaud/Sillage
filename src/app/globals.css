@@ -1456,23 +1456,34 @@ body:has(.trace-vue-layout) .app-main {
   margin-right: 8px;
 }
 
-.trace-vue-stats {
+.trace-vue-stats-wrapper {
   position: absolute;
   top: 16px;
   left: 16px;
   z-index: 10;
-  background: rgba(255, 253, 249, 0.92);
-  backdrop-filter: blur(8px);
-  padding: 12px 16px;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 .trace-vue-squiggle {
   position: absolute;
-  top: -10px;
+  top: -6px;
   left: -10px;
-  z-index: 1;
+  z-index: 2;
+}
+
+.trace-vue-stats {
+  background: rgba(255, 253, 249, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 12px 16px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Sans breadcrumb (vue trace), le stats reprend son radius haut */
+.trace-vue-stats-wrapper > .trace-vue-stats:first-child,
+.trace-vue-squiggle + .trace-vue-stats {
+  border-radius: 10px;
 }
 
 /* Panneau stats compact — lignes horizontales */
@@ -1767,6 +1778,39 @@ body:has(.trace-vue-layout) .app-main {
 }
 
 /* Sur petits écrans, réduire encore le panneau stats */
+@media (max-width: 1080px) {
+  .trace-vue-stats {
+    padding: 8px 12px;
+  }
+  .stat-ligne-label {
+    font-size: 8px;
+  }
+  .stat-ligne-valeur {
+    font-size: 12px;
+  }
+  .stat-ligne-unite {
+    font-size: 8px;
+  }
+  .stats-val-reduite {
+    font-size: 10px;
+  }
+  .stats-val-reduite small {
+    font-size: 8px;
+  }
+  .navigation-nom {
+    font-size: clamp(12px, 2vw, 14px);
+  }
+  .navigation-meta-details {
+    font-size: 9px;
+    letter-spacing: -0.5px;
+    gap: 4px;
+  }
+  .navigation-breadcrumb-flottant {
+    font-size: 7px;
+    padding: 3px 8px 3px 24px;
+  }
+}
+
 @media (max-width: 600px) {
   .trace-vue-stats {
     padding: 8px 12px;
@@ -1816,7 +1860,7 @@ body:has(.trace-vue-layout) .app-main {
   pointer-events: none;
 }
 
-/* Conteneur vent — au-dessus du graphique bateau */
+/* Conteneur vent — onglet au-dessus du graphique */
 .trace-vue-vent {
   position: absolute;
   bottom: calc(var(--hauteur-graphique, 230px) - 20px);
@@ -1824,7 +1868,7 @@ body:has(.trace-vue-layout) .app-main {
   z-index: 11;
 }
 
-/* HUD vent deploye — bande full-width */
+/* HUD vent deploye — bande full-width, onglet sans radius bas */
 .hud-vent-deploye {
   height: 89px;
   background: rgba(0, 0, 0, 0.6);
@@ -2145,6 +2189,38 @@ body:has(.nettoyage-layout) .app-main {
 .rose-des-vents:hover {
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+/* Tablette — onglets colles au graphique */
+@media (max-width: 1080px) {
+  .trace-vue-vent {
+    bottom: calc(var(--hauteur-graphique, 230px) - 56px);
+  }
+  .map-bas-gauche {
+    bottom: calc(var(--hauteur-graphique, 230px) - 56px);
+    align-items: flex-end;
+  }
+  .map-zoom-pill {
+    border-radius: 12px 12px 0 0;
+  }
+  .echelle-carte {
+    border-radius: 12px 12px 0 0;
+  }
+  .rose-des-vents {
+    border-radius: 12px 12px 0 0;
+  }
+  .hud-vent-deploye {
+    border-radius: 10px 10px 0 0;
+  }
+  :has(> .trace-vue-vent > .hud-vent-deploye) > .trace-vue-carte .map-bas-gauche {
+    bottom: calc(var(--hauteur-graphique, 230px) - 56px + 89px - 8px);
+  }
+  :has(> .trace-vue-vent > .hud-vent-deploye) > .trace-vue-carte .map-bas-gauche .map-zoom-pill {
+    border-radius: 12px;
+  }
+  :has(> .trace-vue-vent > .hud-vent-deploye) > .trace-vue-carte .map-bas-gauche .echelle-carte {
+    border-radius: 12px;
+  }
 }
 
 .rose-des-vents-rose {
@@ -2890,9 +2966,10 @@ body:has(.nettoyage-layout) .app-main {
 
 .navigation-meta-details {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   font-size: 11px;
+  letter-spacing: -0.3px;
   color: var(--text-light);
   margin-top: 2px;
 }
@@ -2966,14 +3043,26 @@ body:has(.nettoyage-layout) .app-main {
   font-size: 9px;
   color: white;
   background: rgba(0, 0, 0, 0.5);
-  padding: 2px 10px 2px 29px;
-  border-radius: 8px 8px 0 0;
-  margin: -12px -16px 8px;
+  padding: 3px 10px 3px 29px;
+  border-radius: 10px 10px 0 0;
   letter-spacing: 0.3px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: calc(100% + 32px);
+  min-width: 0;
+}
+
+.breadcrumb-ellipsis {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .breadcrumb-dossier {
+    display: none;
+  }
+  .breadcrumb-ellipsis {
+    display: inline;
+  }
 }
 
 .navigation-vide {
@@ -2990,21 +3079,24 @@ body:has(.nettoyage-layout) .app-main {
   color: var(--accent);
 }
 
-.navigation-date-input {
-  font-family: inherit;
-  font-size: 11px;
-  color: var(--text-secondary);
-  background: transparent;
-  border: 1px solid transparent;
+.navigation-date-texte {
+  cursor: pointer;
   border-radius: 4px;
   padding: 1px 4px;
-  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
 }
 
-.navigation-date-input:hover,
-.navigation-date-input:focus {
+.navigation-date-texte:hover {
   border-color: var(--border-light);
-  outline: none;
+}
+
+.navigation-date-input-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .badge-type-cliquable {

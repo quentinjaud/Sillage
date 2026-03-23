@@ -90,7 +90,7 @@ export default function TraceVueClient({
 
   return (
     <div style={{ "--hauteur-graphique": `${paddingBas}px` } as React.CSSProperties}>
-      <div className="trace-vue-stats trace-vue-stats--avec-squiggle">
+      <div className="trace-vue-stats-wrapper">
         <svg className="trace-vue-squiggle" width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <defs>
             <linearGradient id="sq-grad-t" x1="0" y1="0" x2="1" y2="1">
@@ -104,6 +104,7 @@ export default function TraceVueClient({
           <path d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2" stroke="url(#sq-grad-t)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
+        <div className="trace-vue-stats">
         <PanneauStats
           distanceNm={distanceNm}
           durationSeconds={durationSeconds}
@@ -116,6 +117,7 @@ export default function TraceVueClient({
           onMeteoChargee={handleMeteoChargee}
           onMeteoSupprimee={handleMeteoSupprimee}
         />
+      </div>
       </div>
 
       {pointActif && (
