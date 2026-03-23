@@ -2003,7 +2003,8 @@ body:has(.nettoyage-layout) .app-main {
 }
 
 /* Echelle carte : remonter quand HUD vent deploye */
-.map-wrapper:has(.hud-vent-deploye) .map-bas-gauche {
+/* Quand le HUD vent est deploye (frere de map-wrapper), remonter zoom+echelle */
+:has(> .trace-vue-vent > .hud-vent-deploye) > .trace-vue-carte .map-bas-gauche {
   bottom: calc(var(--hauteur-graphique, 230px) + 96px);
 }
 
