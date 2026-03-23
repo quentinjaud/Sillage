@@ -9,6 +9,8 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import TraceVueClient from "@/components/TraceVueClient";
 import TitreEditable from "@/components/TitreEditable";
+import { calculerStatsVent } from "@/lib/geo/stats-vent";
+import type { CelluleMeteoClient } from "@/lib/types";
 
 interface PropsPage {
   params: Promise<{ id: string }>;
@@ -25,6 +27,7 @@ export default async function TraceDetailPage({ params }: PropsPage) {
         orderBy: { pointIndex: "asc" },
       },
       bateau: { select: { nom: true } },
+      cellulesMeteo: true,
     },
   });
 
@@ -41,6 +44,30 @@ export default async function TraceDetailPage({ params }: PropsPage) {
 
   const pointsNonExclus = trace.points.filter((p) => !p.isExcluded);
   const nbPointsExclus = trace.points.length - pointsNonExclus.length;
+
+  const cellulesMeteo: CelluleMeteoClient[] = (trace.cellulesMeteo ?? []).map((c) => ({
+    latitude: c.latitude,
+    longitude: c.longitude,
+    dateDebut: c.dateDebut.toISOString(),
+    dateFin: c.dateFin.toISOString(),
+    ventVitesseKn: c.ventVitesseKn,
+    ventRafalesKn: c.ventRafalesKn,
+    ventDirectionDeg: c.ventDirectionDeg,
+  }));
+
+  const statsVent =
+    cellulesMeteo.length > 0
+      ? { ...calculerStatsVent(cellulesMeteo), source: "open-meteo-archive", resolution: "25km/1h" }
+      : null;
+
+  const traceTimestamps = pointsNonExclus.some((p) => p.timestamp != null);
+  const traceTropRecente =
+    traceTimestamps &&
+    pointsNonExclus.length > 0 &&
+    (() => {
+      const dernierTs = pointsNonExclus.filter((p) => p.timestamp).pop()?.timestamp;
+      return dernierTs ? Date.now() - new Date(dernierTs).getTime() < 7 * 24 * 60 * 60 * 1000 : false;
+    })();
 
   const pointsSerialises = pointsNonExclus.map((p) => ({
     lat: p.lat,
@@ -81,6 +108,11 @@ export default async function TraceDetailPage({ params }: PropsPage) {
         durationSeconds={trace.durationSeconds}
         avgSpeedKn={trace.avgSpeedKn}
         maxSpeedKn={trace.maxSpeedKn}
+        traceId={trace.id}
+        cellulesMeteo={cellulesMeteo}
+        statsVent={statsVent}
+        traceTimestamps={traceTimestamps}
+        traceTropRecente={traceTropRecente}
       />
     </div>
   );

@@ -10,6 +10,8 @@ import {
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import NavigationVueClient from "@/components/NavigationVueClient";
+import { calculerStatsVent } from "@/lib/geo/stats-vent";
+import type { CelluleMeteoClient } from "@/lib/types";
 
 interface PropsPage {
   params: Promise<{ id: string }>;
@@ -32,6 +34,7 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
           orderBy: { pointIndex: "asc" as const },
         },
         bateau: { select: { id: true, nom: true } },
+        cellulesMeteo: true,
       },
     },
   };
@@ -51,6 +54,31 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
   if (!navigation) notFound();
 
   const trace = navigation.trace;
+
+  const cellulesMeteo: CelluleMeteoClient[] = (trace?.cellulesMeteo ?? []).map((c) => ({
+    latitude: c.latitude,
+    longitude: c.longitude,
+    dateDebut: c.dateDebut.toISOString(),
+    dateFin: c.dateFin.toISOString(),
+    ventVitesseKn: c.ventVitesseKn,
+    ventRafalesKn: c.ventRafalesKn,
+    ventDirectionDeg: c.ventDirectionDeg,
+  }));
+
+  const statsVent =
+    cellulesMeteo.length > 0
+      ? { ...calculerStatsVent(cellulesMeteo), source: "open-meteo-archive", resolution: "25km/1h" }
+      : null;
+
+  const pointsAvecTimestamp = trace?.points.filter((p) => p.timestamp != null) ?? [];
+  const traceTimestamps = pointsAvecTimestamp.length > 0;
+  const traceTropRecente =
+    traceTimestamps &&
+    (() => {
+      const dernierTs = pointsAvecTimestamp[pointsAvecTimestamp.length - 1]?.timestamp;
+      return dernierTs ? Date.now() - new Date(dernierTs).getTime() < 7 * 24 * 60 * 60 * 1000 : false;
+    })();
+
   const pointsSerialises = trace
     ? trace.points.map((p) => ({
         lat: p.lat,
@@ -84,6 +112,11 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
           durationSeconds={trace.durationSeconds}
           avgSpeedKn={trace.avgSpeedKn}
           maxSpeedKn={trace.maxSpeedKn}
+          traceId={trace.id}
+          cellulesMeteo={cellulesMeteo}
+          statsVent={statsVent}
+          traceTimestamps={traceTimestamps}
+          traceTropRecente={traceTropRecente}
         />
       ) : (
         <div className="navigation-vide">
