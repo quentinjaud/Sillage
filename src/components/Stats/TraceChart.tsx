@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { COULEURS } from "@/lib/theme";
+import { interpolerCirculaire, calculerTWA, bordTWA } from "@/lib/geo/twa";
 import { Gauge, Compass, Wind, Navigation2 } from "lucide-react";
 import {
   calculerStatsVitesse,
@@ -170,7 +171,9 @@ export default function TraceChart({
             const a = timeline[j];
             const b = timeline[j + 1];
             const ratio = (t - a.temps) / (b.temps - a.temps);
-            const valeur = a.valeur + ratio * (b.valeur - a.valeur);
+            const valeur = champ === "ventDirectionDeg"
+              ? interpolerCirculaire(a.valeur, b.valeur, ratio)
+              : a.valeur + ratio * (b.valeur - a.valeur);
 
             return { temps: t, heure: p.timestamp!, valeur, pointIndex: p.pointIndex ?? i };
           }),
