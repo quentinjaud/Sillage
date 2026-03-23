@@ -570,21 +570,22 @@ body {
   gap: 3px;
 }
 
-/* Zoom +/- pill collee */
+/* Zoom +/- pill horizontale */
 .map-zoom-pill {
   display: flex;
-  flex-direction: column;
-  border-radius: 16px;
+  flex-direction: row;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 253, 249, 0.6);
+  backdrop-filter: blur(4px);
 }
 
 .map-zoom-btn {
-  width: 30px;
-  height: 28px;
+  width: 28px;
+  height: 24px;
   border: none;
-  background: rgba(255, 253, 249, 0.92);
-  backdrop-filter: blur(8px);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -594,11 +595,11 @@ body {
 }
 
 .map-zoom-btn:first-child {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .map-zoom-btn:hover {
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 /* Boutons selecteurs (couches, orientation) */

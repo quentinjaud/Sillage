@@ -502,9 +502,8 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
         )}
       </div>
 
-      {/* Echelle + zoom — bas gauche */}
+      {/* Zoom + echelle — bas gauche */}
       <div className="map-bas-gauche">
-        <EchelleCarte mapRef={mapRef} />
         <div className="map-zoom-pill">
           <button
             className="map-zoom-btn"
@@ -521,6 +520,7 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
             <Minus style={{ width: 14, height: 14 }} />
           </button>
         </div>
+        <EchelleCarte mapRef={mapRef} />
       </div>
     </div>
   );
