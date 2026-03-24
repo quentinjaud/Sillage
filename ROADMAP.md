@@ -144,7 +144,27 @@ User
 - [ ] Affichage vent sur la carte
 - [ ] HUD vent : source de donnees configurable — pointActif (prioritaire si curseur actif) ou centreCarte (fallback, interpole le vent au centre de la vue carte). Important pour grands parcours ou le vent varie spatialement et temporellement
 
-## Phase 5 — Mode régate & multi-bateaux (v0.6)
+## Phase 4b — Refonte accueil & navigation globale (v0.6) ✅
+
+- [x] Carte OSM plein ecran avec tuiles desaturees
+- [x] Arborescence flottante des journaux de bord (dossiers > navigations)
+- [x] Recherche et filtres (par type, par bateau)
+- [x] Aventures depliables (chevron + sous-navs)
+- [x] Trace affichee a sa vraie position au clic + pills meta
+- [x] Simplification modele : Aventure = type de Navigation
+- [x] Migration Prisma (suppression modele Aventure)
+- [x] Suppression header global → squiggle accueil + bouton user rond
+- [x] Endpoint recalcul polylines manquantes
+
+### A faire (polish accueil)
+- [ ] "Mon port d'attache" dans settings utilisateur (centrer la carte au demarrage)
+- [ ] Panneau Settings en panneau flottant (traces, bateaux, gestion dossiers en tableau)
+- [ ] Traces / Bateaux / Admin en panneaux flottants depuis le menu user (plus de pages separees)
+- [ ] Drag-and-drop de navs entre dossiers et dans les aventures
+
+---
+
+## Phase 5 — Mode régate & multi-bateaux (v0.7)
 
 - [ ] Basculer une navigation en mode "régate"
 - [ ] Ajouter des traces de concurrents avec bateaux invités (nom + couleur)
@@ -153,7 +173,7 @@ User
 - [ ] Replay synchronisé + tableau comparatif par leg
 - [ ] Timeline multi-traces
 
-## Phase 6 — Polaires & Parcours (v0.7)
+## Phase 6 — Polaires & Parcours (v0.8)
 
 - [ ] Diagramme polaire (vitesse vs angle de vent)
 - [ ] Polaires théoriques : import manuel (fichier .pol / CSV) + éditeur intégré
@@ -162,7 +182,7 @@ User
 - [ ] Création de parcours : placement de marques/bouées
 - [ ] Association parcours → navigation régate
 
-## Phase 7 — Partage & Export (v0.8)
+## Phase 7 — Partage & Export (v0.9)
 
 - [ ] Lien public par navigation (contrôle granulaire : journal, photos, stats, perf)
 - [ ] Lien public par dossier/aventure (groupe de navigations)
@@ -170,7 +190,7 @@ User
 - [ ] Export stats PDF + export image carte
 - [ ] Embed iframe
 
-## Phase 8 — Import automatique Navimetrix (v0.9)
+## Phase 8 — Import automatique Navimetrix (v1.0)
 
 - [ ] Addon Navimetrix : streamer a la demande les traces + logs NMEA nouveaux depuis le dernier envoi, directement dans le compte de l'utilisateur sur Sillage
 - [ ] Synchronisation incrementale (delta depuis le dernier sync)
@@ -198,7 +218,7 @@ User
 - [ ] Extraire SVG marqueur bateau en composant (`MarqueurBateau.tsx`) — quand un second usage apparait
 - [ ] Timeline : cleanup listeners `mousemove`/`mouseup` sur unmount (guard `useRef`)
 - [ ] URLs humanisees : slug sur les navigations (`/navigation/solo-la-rochelle` au lieu de l'ID Prisma) — generer un slug unique a partir du nom, sans accents, tirets
-- [ ] Vue journal : navigateur dossiers/aventures/navs en style "dossier ouvert" (inspiration console Next.js) — onglets imbriques, hierarchie visuelle
+- [x] ~~Vue journal : navigateur dossiers/aventures/navs~~ → fait en v0.6 (ArborescenceJournal)
 
 ---
 
