@@ -15,6 +15,20 @@ import RoseDesVents from "@/components/Map/RoseDesVents";
 import { trouverCelluleActive } from "@/lib/geo/stats-vent";
 import type { PointCarte, CelluleMeteoClient, StatsVent } from "@/lib/types";
 import { useEtatVue, HAUTEUR_GRAPHIQUE_INITIALE } from "@/lib/hooks/useEtatVue";
+import { COULEURS } from "@/lib/theme";
+
+/** Couleur d'accent par type de navigation */
+const ACCENT_PAR_TYPE: Record<string, string> = {
+  SOLO: "var(--accent)",
+  AVENTURE: "var(--accent-aventure)",
+  REGATE: "var(--accent-yellow)",
+};
+
+const LABEL_TYPE: Record<string, string> = {
+  SOLO: "Solo",
+  AVENTURE: "Aventure",
+  REGATE: "Regate",
+};
 
 interface PropsNavigationVueClient {
   navigationId: string;
@@ -166,7 +180,7 @@ export default function NavigationVueClient({
   }, [cellulesMeteoState, pointActif]);
 
   return (
-    <div style={{ "--hauteur-graphique": `${paddingBas}px` } as React.CSSProperties}>
+    <div style={{ "--hauteur-graphique": `${paddingBas}px`, "--accent-nav": ACCENT_PAR_TYPE[type] ?? "var(--accent)" } as React.CSSProperties}>
       {/* Squiggle + breadcrumb + panneau stats */}
       <div className="trace-vue-stats-wrapper">
         {!statsReduit && (
@@ -202,13 +216,16 @@ export default function NavigationVueClient({
               autoFocus
             />
           ) : (
-            <h2
-              className="navigation-nom titre-editable"
-              onClick={() => setEnEditionNom(true)}
-              title="Cliquer pour renommer"
-            >
-              {nom}
-            </h2>
+            <div className="navigation-nom-ligne">
+              <h2
+                className="navigation-nom titre-editable"
+                onClick={() => setEnEditionNom(true)}
+                title="Cliquer pour renommer"
+              >
+                {nom}
+              </h2>
+              <span className="navigation-badge-type">{LABEL_TYPE[type] ?? type}</span>
+            </div>
           )}
           <div className="navigation-meta-details" style={statsReduit ? { display: "none" } : undefined}>
             <span
@@ -228,9 +245,9 @@ export default function NavigationVueClient({
             {bateau && (
               <div className="navigation-bateau">
                 <svg width="10" height="16" viewBox="0 0 12 22" fill="none" style={{ transform: "rotate(30deg)" }}>
-                  <path d="M6 0 Q12 8 11 16 L10 20 L2 20 L1 16 Q0 8 6 0 Z" fill="#F6BC00" stroke="white" strokeWidth="1" />
+                  <path d="M6 0 Q12 8 11 16 L10 20 L2 20 L1 16 Q0 8 6 0 Z" fill="var(--accent-nav)" stroke="white" strokeWidth="1" />
                 </svg>
-                <span style={{ color: "#F6BC00" }}>{bateau.nom}</span>
+                <span style={{ color: "var(--accent-nav)" }}>{bateau.nom}</span>
               </div>
             )}
             <button

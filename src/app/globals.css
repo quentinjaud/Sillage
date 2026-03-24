@@ -2728,11 +2728,29 @@ body {
   margin-bottom: 8px;
 }
 
+.navigation-nom-ligne {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .navigation-nom {
   font-size: clamp(14px, 2vw, 18px);
   font-weight: 600;
   margin: 0;
   color: var(--text-primary);
+}
+
+.navigation-badge-type {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--accent-nav, var(--accent));
+  color: white;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
 }
 
 .navigation-meta-details {
@@ -2795,6 +2813,7 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  border-left: 3px solid var(--accent-nav, var(--accent));
 }
 
 .breadcrumb-ellipsis {
