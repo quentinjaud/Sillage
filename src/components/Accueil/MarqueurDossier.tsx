@@ -29,8 +29,7 @@ export default function MarqueurDossier({
       draggable={!!onDragEnd}
       onDragEnd={(e) => {
         if (!onDragEnd) return;
-        const snapped = snapperVersPointProche(e.lngLat.lat, e.lngLat.lng);
-        onDragEnd(dossier.id, snapped.lat, snapped.lon);
+        onDragEnd(dossier.id, e.lngLat.lat, e.lngLat.lng);
       }}
     >
       <button

@@ -107,29 +107,28 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
 
   return (
     <div className="accueil-layout">
-      {/* Panneau lateral gauche — liste des dossiers */}
-      <div className="accueil-panneau-lateral">
-        <div className="accueil-panneau-header">
-          <h2 className="accueil-panneau-titre">Mes dossiers</h2>
-          <button
-            className="btn-settings-accueil"
-            title="Parametres"
-            onClick={() => setSettingsOuvert(true)}
-          >
-            ⚙
-          </button>
-        </div>
+      {/* Carte OSM plein ecran */}
+      <CarteOGF>
+        {navPreview && <TracePreview navigation={navPreview} />}
+      </CarteOGF>
 
-        {dossiers.length === 0 ? (
-          <div className="accueil-panneau-vide">
-            <p>Bienvenue Marin !</p>
-            <p>Cree ton premier dossier pour commencer a tracer des sillages.</p>
-            <button className="btn-principal" onClick={ouvrirModaleDossier}>
-              Creer un dossier
-            </button>
+      {/* Panneaux flottants empiles verticalement */}
+      <div className="accueil-panneaux">
+        {/* Panneau dossiers */}
+        <div className="accueil-panneau-dossiers">
+          <div className="accueil-panneau-header">
+            <h2 className="accueil-panneau-titre">Mes dossiers</h2>
           </div>
-        ) : (
-          <>
+
+          {dossiers.length === 0 ? (
+            <div className="accueil-panneau-vide">
+              <p>Bienvenue Marin !</p>
+              <p>Cree ton premier dossier pour commencer.</p>
+              <button className="btn-principal" onClick={ouvrirModaleDossier}>
+                Creer un dossier
+              </button>
+            </div>
+          ) : (
             <div className="accueil-liste-dossiers">
               {dossiers.map((dossier) => (
                 <button
@@ -143,33 +142,29 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
                   </span>
                 </button>
               ))}
+              <button
+                className="accueil-dossier-item accueil-dossier-item-nouveau"
+                onClick={ouvrirModaleDossier}
+              >
+                + Nouveau dossier
+              </button>
             </div>
-            <button className="btn-secondaire accueil-btn-nouveau" onClick={ouvrirModaleDossier}>
-              + Nouveau dossier
-            </button>
-          </>
+          )}
+        </div>
+
+        {/* Panneau contenu — se deploie sous le panneau dossiers */}
+        {dossierActif && dossierSelectionne && (
+          <PanneauContenu
+            dossierId={dossierActif}
+            nomDossier={dossierSelectionne.nom}
+            onFermer={gererFermer}
+            onClicNavigation={gererClicNavigation}
+            onOuvrir={gererOuvrir}
+            onCreerNav={ouvrirModaleNav}
+            onCreerSousDossier={ouvrirModaleSousDossier}
+          />
         )}
       </div>
-
-      {/* Carte OSM — fond + trace preview */}
-      <div className="accueil-carte">
-        <CarteOGF>
-          {navPreview && <TracePreview navigation={navPreview} />}
-        </CarteOGF>
-      </div>
-
-      {/* Panneau contenu flottant — s'ouvre au clic sur un dossier */}
-      {dossierActif && dossierSelectionne && (
-        <PanneauContenu
-          dossierId={dossierActif}
-          nomDossier={dossierSelectionne.nom}
-          onFermer={gererFermer}
-          onClicNavigation={gererClicNavigation}
-          onOuvrir={gererOuvrir}
-          onCreerNav={ouvrirModaleNav}
-          onCreerSousDossier={ouvrirModaleSousDossier}
-        />
-      )}
 
       <PanneauSettings
         ouvert={settingsOuvert}

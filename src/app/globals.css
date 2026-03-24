@@ -3065,41 +3065,69 @@ body:has(.nettoyage-layout) .app-main {
   }
 }
 
-/* === Accueil — Layout lateral + carte === */
+/* === Accueil — Carte plein ecran + panneaux flottants === */
 .accueil-layout {
-  display: flex;
+  position: relative;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
 }
 
-.accueil-panneau-lateral {
-  width: 280px;
-  flex-shrink: 0;
+.carte-ogf-container {
+  position: absolute;
+  inset: 0;
+}
+
+.carte-ogf-container .maplibregl-canvas {
+  background: var(--background);
+}
+
+/* Colonne de panneaux flottants empiles */
+.accueil-panneaux {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  z-index: 20;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 253, 249, 0.96);
-  border-right: 1px solid var(--border-light);
-  z-index: 10;
+  gap: 8px;
+  max-height: calc(100vh - 92px);
+  pointer-events: none;
+}
+
+.accueil-panneaux > * {
+  pointer-events: auto;
+}
+
+/* Panneau dossiers — detache, avec bordures */
+.accueil-panneau-dossiers {
+  width: 280px;
+  background: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .accueil-panneau-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-light);
 }
 
 .accueil-panneau-titre {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   margin: 0;
 }
 
 .accueil-liste-dossiers {
-  flex: 1;
+  max-height: 300px;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .accueil-dossier-item {
@@ -3107,7 +3135,7 @@ body:has(.nettoyage-layout) .app-main {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 16px;
+  padding: 8px 16px;
   background: none;
   border: none;
   border-left: 3px solid transparent;
@@ -3120,13 +3148,18 @@ body:has(.nettoyage-layout) .app-main {
 }
 
 .accueil-dossier-item:hover {
-  background: var(--border-light);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .accueil-dossier-item-actif {
   border-left-color: var(--accent-yellow);
   background: rgba(246, 188, 0, 0.08);
   font-weight: 600;
+}
+
+.accueil-dossier-item-nouveau {
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 
 .accueil-dossier-nom {
@@ -3147,42 +3180,25 @@ body:has(.nettoyage-layout) .app-main {
   text-align: center;
 }
 
-.accueil-btn-nouveau {
-  margin: 8px 16px 16px;
-}
-
 .accueil-panneau-vide {
-  padding: 32px 16px;
+  padding: 24px 16px;
   text-align: center;
   color: var(--text-secondary);
   font-size: 13px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
-.accueil-carte {
-  flex: 1;
-  position: relative;
-}
-
-.carte-ogf-container {
-  width: 100%;
-  height: 100%;
-}
-
-.carte-ogf-container .maplibregl-canvas {
-  background: var(--background);
-}
-
-/* === Panneau contenu dossier (flottant par-dessus la carte) === */
+/* === Panneau contenu dossier (deploie sous le panneau dossiers) === */
 .panneau-contenu {
-  position: fixed;
-  top: 24px;
-  left: 304px;
-  z-index: 20;
-  width: 320px;
+  width: 280px;
+  background: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;

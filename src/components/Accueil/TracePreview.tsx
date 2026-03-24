@@ -28,11 +28,8 @@ export default function TracePreview({ navigation }: PropsTracePreview) {
       properties: {},
       geometry: {
         type: "LineString" as const,
-        // polylineSimplifiee est en [lat, lon], GeoJSON attend [lon, lat]
-        coordinates: (polyline as [number, number][]).map(([lat, lon]) => [
-          lon,
-          lat,
-        ]),
+        // polylineSimplifiee est deja en [lon, lat] (format GeoJSON)
+        coordinates: polyline as [number, number][],
       },
     };
   }, [polyline]);
