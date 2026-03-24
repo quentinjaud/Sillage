@@ -320,6 +320,7 @@ function NoeudNavigation({
               (sn: any): ResumeNavigation => ({
                 id: sn.id,
                 nom: sn.nom,
+                slug: sn.slug ?? null,
                 date: sn.date,
                 type: sn.type,
                 dossierId: sn.dossierId,

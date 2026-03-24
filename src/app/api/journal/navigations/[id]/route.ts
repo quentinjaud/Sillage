@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { obtenirSession, obtenirIdUtilisateurEffectif } from "@/lib/session";
 import { journalErreur } from "@/lib/journal";
+import { genererSlug } from "@/lib/slug";
 
 export async function GET(
   _requete: NextRequest,
@@ -93,6 +94,7 @@ export async function PATCH(
 
     const data: {
       nom?: string;
+      slug?: string | null;
       date?: Date;
       type?: "SOLO" | "AVENTURE" | "REGATE";
       parentNavId?: string | null;
@@ -104,6 +106,19 @@ export async function PATCH(
         return NextResponse.json({ error: "Nom invalide" }, { status: 400 });
       }
       data.nom = nom.trim();
+
+      // Regenerer le slug
+      const slugBase = genererSlug(data.nom);
+      if (slugBase) {
+        const existants = await prisma.navigation.findMany({
+          where: { slug: { startsWith: slugBase }, id: { not: id } },
+          select: { slug: true },
+        });
+        const slugsExistants = existants.map((n) => n.slug).filter(Boolean) as string[];
+        data.slug = slugsExistants.includes(slugBase)
+          ? (() => { let c = 2; while (slugsExistants.includes(`${slugBase}-${c}`)) c++; return `${slugBase}-${c}`; })()
+          : slugBase;
+      }
     }
 
     if (date !== undefined) {
@@ -158,6 +173,7 @@ export async function PATCH(
     return NextResponse.json({
       id: miseAJour.id,
       nom: miseAJour.nom,
+      slug: miseAJour.slug,
       date: miseAJour.date.toISOString(),
       type: miseAJour.type,
       dossierId: miseAJour.dossierId,

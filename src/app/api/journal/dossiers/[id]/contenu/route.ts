@@ -50,6 +50,7 @@ export async function GET(
         select: {
           id: true,
           nom: true,
+          slug: true,
           date: true,
           type: true,
           dossierId: true,
@@ -88,6 +89,7 @@ export async function GET(
       navigations: navigations.map((nav): ResumeNavigation => ({
         id: nav.id,
         nom: nav.nom,
+        slug: nav.slug ?? null,
         date: nav.date.toISOString(),
         type: nav.type as "SOLO" | "AVENTURE" | "REGATE",
         dossierId: nav.dossierId,

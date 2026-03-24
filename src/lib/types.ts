@@ -167,6 +167,7 @@ export interface ResumeTraceNavigation {
 export interface ResumeNavigation {
   id: string;
   nom: string;
+  slug: string | null;
   date: string;
   type: "SOLO" | "AVENTURE" | "REGATE";
   dossierId: string;

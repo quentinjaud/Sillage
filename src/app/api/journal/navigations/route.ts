@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { obtenirSession, obtenirIdUtilisateurEffectif } from "@/lib/session";
 import { journalErreur } from "@/lib/journal";
+import { genererSlug } from "@/lib/slug";
 
 export async function POST(requete: NextRequest) {
   const session = await obtenirSession();
@@ -74,9 +75,26 @@ export async function POST(requete: NextRequest) {
 
     const typeValide = ["SOLO", "AVENTURE", "REGATE"].includes(type) ? type : "SOLO";
 
+    // Generer un slug unique
+    const slugBase = genererSlug(nom.trim());
+    let slug = slugBase;
+    if (slug) {
+      const existants = await prisma.navigation.findMany({
+        where: { slug: { startsWith: slugBase } },
+        select: { slug: true },
+      });
+      const slugsExistants = existants.map((n) => n.slug).filter(Boolean) as string[];
+      if (slugsExistants.includes(slug)) {
+        let compteur = 2;
+        while (slugsExistants.includes(`${slugBase}-${compteur}`)) compteur++;
+        slug = `${slugBase}-${compteur}`;
+      }
+    }
+
     const navigation = await prisma.navigation.create({
       data: {
         nom: nom.trim(),
+        slug: slug || null,
         date: new Date(date),
         type: typeValide,
         userId,
@@ -90,6 +108,7 @@ export async function POST(requete: NextRequest) {
       {
         id: navigation.id,
         nom: navigation.nom,
+        slug: navigation.slug,
         date: navigation.date.toISOString(),
         type: navigation.type,
         dossierId: navigation.dossierId,

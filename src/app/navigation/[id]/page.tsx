@@ -39,16 +39,30 @@ export default async function NavigationDetailPage({ params }: PropsPage) {
     },
   };
 
+  // Chercher par ID d'abord, puis par slug
   let navigation = await prisma.navigation.findFirst({
     where: { id, userId },
     include,
   });
+
+  if (!navigation) {
+    navigation = await prisma.navigation.findFirst({
+      where: { slug: id, userId },
+      include,
+    });
+  }
 
   if (!navigation && estAdmin(session)) {
     navigation = await prisma.navigation.findUnique({
       where: { id },
       include,
     });
+    if (!navigation) {
+      navigation = await prisma.navigation.findFirst({
+        where: { slug: id },
+        include,
+      });
+    }
   }
 
   if (!navigation) notFound();

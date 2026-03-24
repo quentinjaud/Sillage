@@ -100,7 +100,7 @@ export default function PageAccueil({ dossiers, bateaux, portAttache }: PropsPag
       {navPreview && (
         <BarreMetaNav
           navigation={navPreview}
-          onOuvrir={() => gererOuvrir(navPreview.id)}
+          onOuvrir={() => gererOuvrir(navPreview.slug ?? navPreview.id)}
         />
       )}
 
