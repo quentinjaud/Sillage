@@ -4,8 +4,8 @@ import { prisma } from "@/lib/db";
 import { obtenirSession, obtenirIdUtilisateurEffectif } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { journalErreur } from "@/lib/journal";
-import PageJournal from "@/components/Journal/PageJournal";
-import type { ResumeDossier, ResumeBateau, ResumeTrace } from "@/lib/types";
+import PageAccueil from "@/components/Accueil/PageAccueil";
+import type { ResumeDossier } from "@/lib/types";
 
 export default async function PageJournalServeur() {
   const session = await obtenirSession();
@@ -16,59 +16,27 @@ export default async function PageJournalServeur() {
   const userId = await obtenirIdUtilisateurEffectif(session);
 
   let dossiers: ResumeDossier[] = [];
-  let bateaux: ResumeBateau[] = [];
-  let tracesDisponibles: ResumeTrace[] = [];
   let erreurBD = false;
 
   try {
-    const [resultDossiers, resultBateaux, resultTraces] = await Promise.all([
-      prisma.dossier.findMany({
-        where: { userId, parentId: null },
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          nom: true,
-          description: true,
-          markerLat: true,
-          markerLon: true,
-          parentId: true,
-          createdAt: true,
-          _count: { select: { sousDossiers: true, navigations: true } },
-        },
-      }),
-      prisma.bateau.findMany({
-        where: { userId },
-        orderBy: { nom: "asc" },
-      }),
-      // Traces not linked to any navigation (available for association)
-      prisma.trace.findMany({
-        where: { userId, navigation: null },
-        orderBy: [{ startedAt: { sort: "desc", nulls: "last" } }, { createdAt: "desc" }],
-        select: {
-          id: true, name: true, filename: true, format: true, source: true,
-          createdAt: true, startedAt: true,
-          distanceNm: true, durationSeconds: true, avgSpeedKn: true, maxSpeedKn: true,
-          bateauId: true, bateau: { select: { id: true, nom: true } },
-        },
-      }),
-    ]);
+    const resultDossiers = await prisma.dossier.findMany({
+      where: { userId, parentId: null },
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: { select: { sousDossiers: true, navigations: true } },
+      },
+    });
 
     dossiers = resultDossiers.map((d) => ({
-      id: d.id, nom: d.nom, description: d.description,
-      markerLat: d.markerLat, markerLon: d.markerLon, parentId: d.parentId,
-      nbSousDossiers: d._count.sousDossiers, nbNavigations: d._count.navigations,
+      id: d.id,
+      nom: d.nom,
+      description: d.description,
+      markerLat: d.markerLat,
+      markerLon: d.markerLon,
+      parentId: d.parentId,
+      nbSousDossiers: d._count.sousDossiers,
+      nbNavigations: d._count.navigations,
       createdAt: d.createdAt.toISOString(),
-    }));
-
-    bateaux = resultBateaux.map((b) => ({
-      id: b.id, nom: b.nom, classe: b.classe, longueur: b.longueur,
-      createdAt: b.createdAt.toISOString(),
-    }));
-
-    tracesDisponibles = resultTraces.map((t) => ({
-      ...t,
-      createdAt: t.createdAt.toISOString(),
-      startedAt: t.startedAt?.toISOString() ?? null,
     }));
   } catch (erreur) {
     journalErreur("PageJournal", erreur);
@@ -82,7 +50,7 @@ export default async function PageJournalServeur() {
           Impossible de charger les donnees. Veuillez rafraichir la page.
         </div>
       )}
-      <PageJournal dossiers={dossiers} bateaux={bateaux} tracesDisponibles={tracesDisponibles} />
+      <PageAccueil dossiers={dossiers} />
     </>
   );
 }

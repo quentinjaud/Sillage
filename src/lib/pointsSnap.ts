@@ -34,8 +34,8 @@ export const VUE_INITIALE_OGF = {
 
 /** Zone d'eau libre pour projeter les traces (cote droit du viewport) */
 export const ZONE_PROJECTION_TRACE = {
-  latitude: -28.90,
-  longitude: 49.50,
+  lat: -28.90,
+  lon: 49.50,
 } as const;
 
 /**
