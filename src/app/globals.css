@@ -3245,7 +3245,8 @@ body {
   font-weight: 600;
   font-family: inherit;
   padding: 4px 12px;
-  min-height: 28px;
+  min-height: 36px;
+  min-width: 44px;
 }
 
 /* Ligne item actif */
