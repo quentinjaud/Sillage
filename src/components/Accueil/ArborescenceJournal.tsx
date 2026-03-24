@@ -246,6 +246,7 @@ function NoeudDossier({
                   key={nav.id}
                   nav={nav}
                   actif={nav.id === navActiveId}
+                  navActiveId={navActiveId}
                   onClick={onClicNavigation}
                   profondeur={profondeur + 1}
                 />
@@ -267,19 +268,26 @@ function NoeudDossier({
   );
 }
 
-// --- Noeud navigation ---
+// --- Noeud navigation (+ depliable pour aventures) ---
 
 function NoeudNavigation({
   nav,
   actif,
+  navActiveId,
   onClick,
   profondeur,
 }: {
   nav: ResumeNavigation;
   actif: boolean;
+  navActiveId: string | null;
   onClick: (nav: ResumeNavigation) => void;
   profondeur: number;
 }) {
+  const [ouvert, setOuvert] = useState(false);
+  const [sousNavs, setSousNavs] = useState<ResumeNavigation[] | null>(null);
+  const [chargement, setChargement] = useState(false);
+
+  const estAventure = nav.type === "AVENTURE" && nav.nbSousNavs > 0;
   const couleur = COULEURS_TYPE[nav.type] ?? "var(--accent)";
   const distance = nav.trace?.distanceNm;
   const date = new Date(nav.date).toLocaleDateString("fr-FR", {
@@ -287,18 +295,109 @@ function NoeudNavigation({
     month: "short",
   });
 
+  const toggleAventure = useCallback(async () => {
+    if (!ouvert && !sousNavs && !chargement) {
+      setChargement(true);
+      try {
+        const res = await fetch(`/api/journal/navigations/${nav.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSousNavs(
+            (data.sousNavigations ?? []).map(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (sn: any): ResumeNavigation => ({
+                id: sn.id,
+                nom: sn.nom,
+                date: sn.date,
+                type: sn.type,
+                dossierId: sn.dossierId,
+                parentNavId: sn.parentNavId,
+                nbSousNavs: sn.sousNavigations?.length ?? sn._count?.sousNavigations ?? 0,
+                trace: sn.trace
+                  ? {
+                      id: sn.trace.id,
+                      name: sn.trace.name,
+                      distanceNm: sn.trace.distanceNm,
+                      durationSeconds: sn.trace.durationSeconds,
+                      avgSpeedKn: sn.trace.avgSpeedKn,
+                      maxSpeedKn: sn.trace.maxSpeedKn,
+                      polylineSimplifiee: sn.trace.polylineSimplifiee ?? null,
+                      bateau: sn.trace.bateau ?? null,
+                    }
+                  : null,
+                polylineCache: sn.polylineCache ?? null,
+                createdAt: sn.createdAt,
+              })
+            )
+          );
+        }
+      } finally {
+        setChargement(false);
+      }
+    }
+    setOuvert((prev) => !prev);
+  }, [ouvert, sousNavs, chargement, nav.id]);
+
+  const Chevron = ouvert ? ChevronDown : ChevronRight;
+
   return (
-    <button
-      className={`arbo-nav ${actif ? "arbo-nav-actif" : ""}`}
-      style={{ paddingLeft: `${32 + profondeur * 16}px` }}
-      onClick={() => onClick(nav)}
-    >
-      <span className="arbo-nav-dot" style={{ background: couleur }} />
-      <span className="arbo-nav-nom">{nav.nom}</span>
-      <span className="arbo-nav-meta">
-        {date}
-        {distance != null && ` · ${formaterDistance(distance)}`}
-      </span>
-    </button>
+    <div className="arbo-noeud">
+      <div
+        className={`arbo-nav ${actif ? "arbo-nav-actif" : ""}`}
+        style={{ paddingLeft: `${32 + profondeur * 16}px` }}
+      >
+        {estAventure ? (
+          <button
+            className="arbo-chevron-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAventure();
+            }}
+          >
+            <Chevron size={12} className="arbo-chevron" />
+          </button>
+        ) : (
+          <span className="arbo-nav-dot" style={{ background: couleur }} />
+        )}
+        <button
+          className="arbo-nav-clickable"
+          onClick={() => onClick(nav)}
+        >
+          {estAventure && (
+            <span className="arbo-nav-dot" style={{ background: couleur }} />
+          )}
+          <span className="arbo-nav-nom">{nav.nom}</span>
+          <span className="arbo-nav-meta">
+            {date}
+            {distance != null && ` · ${formaterDistance(distance)}`}
+            {estAventure && ` · ${nav.nbSousNavs} navs`}
+          </span>
+        </button>
+      </div>
+
+      {estAventure && ouvert && (
+        <div className="arbo-enfants">
+          {chargement ? (
+            <div
+              className="arbo-chargement"
+              style={{ paddingLeft: `${48 + profondeur * 16}px` }}
+            >
+              ...
+            </div>
+          ) : (
+            sousNavs?.map((sn) => (
+              <NoeudNavigation
+                key={sn.id}
+                nav={sn}
+                actif={sn.id === navActiveId}
+                navActiveId={navActiveId}
+                onClick={onClick}
+                profondeur={profondeur + 1}
+              />
+            ))
+          )}
+        </div>
+      )}
+    </div>
   );
 }
