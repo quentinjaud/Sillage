@@ -158,8 +158,8 @@ User
 
 ### A faire (polish accueil)
 - [ ] "Mon port d'attache" dans settings utilisateur (centrer la carte au demarrage)
-- [ ] Panneau Settings en panneau flottant (traces, bateaux, gestion dossiers en tableau)
-- [ ] Traces / Bateaux / Admin en panneaux flottants depuis le menu user (plus de pages separees)
+- [x] ~~Traces / Bateaux en panneaux flottants depuis le menu user~~ (PanneauContext + zone D droite)
+- [ ] Panneau Preferences (port d'attache, futures prefs)
 - [ ] Drag-and-drop de navs entre dossiers et dans les aventures
 
 ---
@@ -212,9 +212,9 @@ User
 
 ## Refactorings en attente
 
-- [ ] Extraire `creerStyleCarte` en module partage (`src/lib/geo/style-carte.ts`) — duplique entre TraceMap et CarteNettoyage
-- [ ] Constantes layer IDs MapLibre (`"osm"`, `"satellite"`, `"openseamap"`) — strings repetees dans TraceMap
-- [ ] Generaliser `TitreEditable` avec callback `onSave` — reutilisable pour trace et navigation
+- [x] ~~Extraire `creerStyleCarte` en module partage~~ → `src/lib/maps/style-carte.ts`
+- [x] ~~Constantes layer IDs MapLibre~~ → `src/lib/maps/layer-ids.ts`
+- [x] ~~Generaliser `TitreEditable` avec callback `onSave`~~ → prop optionnelle `onSave`
 - [ ] Extraire SVG marqueur bateau en composant (`MarqueurBateau.tsx`) — quand un second usage apparait
 - [ ] Timeline : cleanup listeners `mousemove`/`mouseup` sur unmount (guard `useRef`)
 - [ ] URLs humanisees : slug sur les navigations (`/navigation/solo-la-rochelle` au lieu de l'ID Prisma) — generer un slug unique a partir du nom, sans accents, tirets

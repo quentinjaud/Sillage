@@ -1,5 +1,42 @@
 # Sillage — Changelog
 
+## v0.6.1 — Session nuit : refactorings, panneaux, UX (2026-03-25)
+
+### Refactorings techniques
+- `creerStyleCarte()` extrait en module partage (`src/lib/maps/style-carte.ts`) — 3 variantes (base, satellite, desaturation)
+- Layer IDs MapLibre centralises (`src/lib/maps/layer-ids.ts`) — plus de strings magiques
+- `TitreEditable` generique avec callback `onSave` optionnel
+
+### Cibles tactiles 44px
+- Chevron arborescence : 32px → 44px
+- Bouton "Ouvrir" barre meta : 36px → 44px
+- Boutons tri/filtre traces + input recherche : min-height 44px
+
+### Couleur d'accent par type de navigation
+- CSS variable `--accent-nav` settee dynamiquement selon le type (SOLO=bleu, AVENTURE=rouge, REGATE=jaune)
+- Badge type (pill) a cote du nom dans NavVue
+- Bordure gauche coloree sur le breadcrumb
+- Couleur bateau dynamique au lieu de #F6BC00 hardcode
+
+### Barre d'outils flottante
+- Composant `BarreOutils` generique (zone A, sous les stats)
+- TraceVue : boutons Nettoyer, Editer, Lier a une navigation
+- NavVue : boutons Partager, Editer meta
+
+### Panneaux flottants (zone D)
+- `PanneauContext` global avec provider dans layout
+- Panneau Traces et Bateaux a droite de l'ecran, ouverts depuis le menu user
+- Fonctionnent sur toutes les vues (accueil, TraceVue, NavVue)
+- Menu user : "Mes traces" et "Mes bateaux" ouvrent les panneaux au lieu de naviguer
+- Nouveau item "Preferences" dans le menu
+
+### En cours
+- Panneau preferences + port d'attache
+- URLs humanisees (slugs)
+- Zoom temporel (Phase 3c)
+- Entrees journal texte + toggle journal/perf (Phase 3d)
+- Lien de partage public (Phase 7)
+
 ## v0.6.0 — Refonte accueil carte OSM (2026-03-24)
 
 ### Nouvelle page d'accueil
