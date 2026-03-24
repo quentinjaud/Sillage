@@ -4,11 +4,14 @@ import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface PropsTitreEditable {
-  traceId: string;
+  /** ID de la trace — utilise si onSave n'est pas fourni */
+  traceId?: string;
   nom: string;
+  /** Callback personnalise pour sauvegarder. Si absent, PATCH /api/traces/[traceId] */
+  onSave?: (nouveauNom: string) => Promise<void>;
 }
 
-export default function TitreEditable({ traceId, nom }: PropsTitreEditable) {
+export default function TitreEditable({ traceId, nom, onSave }: PropsTitreEditable) {
   const router = useRouter();
   const [enEdition, setEnEdition] = useState(false);
   const [valeur, setValeur] = useState(nom);
@@ -23,13 +26,16 @@ export default function TitreEditable({ traceId, nom }: PropsTitreEditable) {
     }
 
     try {
-      const reponse = await fetch(`/api/traces/${traceId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: nomNettoye }),
-      });
-
-      if (!reponse.ok) throw new Error();
+      if (onSave) {
+        await onSave(nomNettoye);
+      } else if (traceId) {
+        const reponse = await fetch(`/api/traces/${traceId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: nomNettoye }),
+        });
+        if (!reponse.ok) throw new Error();
+      }
 
       setEnEdition(false);
       router.refresh();
@@ -37,7 +43,7 @@ export default function TitreEditable({ traceId, nom }: PropsTitreEditable) {
       setValeur(nom);
       setEnEdition(false);
     }
-  }, [valeur, nom, traceId, router]);
+  }, [valeur, nom, traceId, onSave, router]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

@@ -8,7 +8,7 @@ import MapGL, {
   Marker,
 } from "react-map-gl/maplibre";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl/maplibre";
-import type { StyleSpecification } from "maplibre-gl";
+
 import "maplibre-gl/dist/maplibre-gl.css";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -38,56 +38,13 @@ import {
   calculerStatsVitesse,
   vitesseVersCouleur,
 } from "@/lib/geo/couleur-vitesse";
-
-/** Style MapLibre avec OSM, Satellite et OpenSeaMap */
-function creerStyleCarte(): StyleSpecification {
-  return {
-    version: 8,
-    sources: {
-      osm: {
-        type: "raster",
-        tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-        tileSize: 256,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-      },
-      satellite: {
-        type: "raster",
-        tiles: [
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        ],
-        tileSize: 256,
-        attribution: "&copy; Esri",
-      },
-      openseamap: {
-        type: "raster",
-        tiles: ["https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"],
-        tileSize: 256,
-      },
-    },
-    layers: [
-      {
-        id: "osm",
-        type: "raster",
-        source: "osm",
-        layout: { visibility: "visible" },
-      },
-      {
-        id: "satellite",
-        type: "raster",
-        source: "satellite",
-        layout: { visibility: "none" },
-      },
-      {
-        id: "openseamap",
-        type: "raster",
-        source: "openseamap",
-        paint: { "raster-opacity": 0.8 },
-        layout: { visibility: "visible" },
-      },
-    ],
-  };
-}
+import { creerStyleCarte } from "@/lib/maps/style-carte";
+import {
+  LAYER_OSM,
+  LAYER_SATELLITE,
+  LAYER_OPENSEAMAP,
+  type FondCarte,
+} from "@/lib/maps/layer-ids";
 
 interface InfoPopup {
   lon: number;
@@ -109,7 +66,7 @@ function formaterCoord(decimal: number, positif: string, negatif: string): strin
 
 export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointActifIndex, pointFixeIndex, onHoverPoint, onClickPoint, cellulesMeteo, statsVent, donneeGraphee, ventDeploye, donneeVentDeployee, onClickRoseDesVents, onBearingChange }: PropsCarteTrace) {
   const mapRef = useRef<MapRef>(null);
-  const [fondCarte, setFondCarte] = useState<"osm" | "satellite">("osm");
+  const [fondCarte, setFondCarte] = useState<FondCarte>("osm");
   const [afficherSeaMap, setAfficherSeaMap] = useState(true);
   const [popupInfo, setPopupInfo] = useState<InfoPopup | null>(null);
   const [panneauCouchesOuvert, setPanneauCouchesOuvert] = useState(false);
@@ -198,19 +155,19 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
     return { type: "FeatureCollection" as const, features };
   }, [points]);
 
-  const styleCarte = useMemo(() => creerStyleCarte(), []);
+  const styleCarte = useMemo(() => creerStyleCarte({ satellite: true }), []);
 
   const basculerFond = useCallback(
-    (fond: "osm" | "satellite") => {
+    (fond: FondCarte) => {
       const carte = mapRef.current?.getMap();
       if (!carte) return;
       carte.setLayoutProperty(
-        "osm",
+        LAYER_OSM,
         "visibility",
         fond === "osm" ? "visible" : "none"
       );
       carte.setLayoutProperty(
-        "satellite",
+        LAYER_SATELLITE,
         "visibility",
         fond === "satellite" ? "visible" : "none"
       );
@@ -223,7 +180,7 @@ export default function TraceMap({ points, maxSpeed, paddingBottom = 40, pointAc
     const carte = mapRef.current?.getMap();
     if (!carte) return;
     carte.setLayoutProperty(
-      "openseamap",
+      LAYER_OPENSEAMAP,
       "visibility",
       actif ? "visible" : "none"
     );

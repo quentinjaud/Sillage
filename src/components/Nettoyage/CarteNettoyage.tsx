@@ -8,10 +8,10 @@ import MapGL, {
   NavigationControl,
 } from "react-map-gl/maplibre";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl/maplibre";
-import type { StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { PointNettoyage } from "@/lib/types";
 import { COULEURS } from "@/lib/theme";
+import { creerStyleCarte } from "@/lib/maps/style-carte";
 
 interface PropsCarteNettoyage {
   points: PointNettoyage[];
@@ -19,35 +19,6 @@ interface PropsCarteNettoyage {
   pointSurvole: number | null;
   onClickPoint: (pointIndex: number) => void;
   onHoverPoint: (pointIndex: number | null) => void;
-}
-
-function creerStyleCarte(): StyleSpecification {
-  return {
-    version: 8,
-    sources: {
-      osm: {
-        type: "raster",
-        tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-        tileSize: 256,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-      },
-      openseamap: {
-        type: "raster",
-        tiles: ["https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"],
-        tileSize: 256,
-      },
-    },
-    layers: [
-      { id: "osm", type: "raster", source: "osm" },
-      {
-        id: "openseamap",
-        type: "raster",
-        source: "openseamap",
-        paint: { "raster-opacity": 0.8 },
-      },
-    ],
-  };
 }
 
 export default function CarteNettoyage({
