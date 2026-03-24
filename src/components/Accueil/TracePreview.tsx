@@ -36,7 +36,7 @@ export default function TracePreview({ navigation }: PropsTracePreview) {
 
   // Centrer la carte sur la trace
   useEffect(() => {
-    if (!geojson || !map) return;
+    if (!geojson || !map || !map.getStyle()) return;
     const coords = geojson.geometry.coordinates;
     if (coords.length === 0) return;
 

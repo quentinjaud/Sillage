@@ -2931,12 +2931,12 @@ body {
   overflow: hidden;
 }
 
-.carte-ogf-container {
+.carte-fond-container {
   position: absolute;
   inset: 0;
 }
 
-.carte-ogf-container .maplibregl-canvas {
+.carte-fond-container .maplibregl-canvas {
   background: var(--background);
 }
 

@@ -4,7 +4,7 @@ import { useRef, type ReactNode } from "react";
 import Map, { type MapRef } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-interface PropsCarteOGF {
+interface PropsCarteFond {
   children?: ReactNode;
 }
 
@@ -38,11 +38,11 @@ const STYLE_OSM = {
   ],
 };
 
-export default function CarteOGF({ children }: PropsCarteOGF) {
+export default function CarteFond({ children }: PropsCarteFond) {
   const mapRef = useRef<MapRef>(null);
 
   return (
-    <div className="carte-ogf-container">
+    <div className="carte-fond-container">
       <Map
         ref={mapRef}
         initialViewState={VUE_INITIALE}

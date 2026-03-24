@@ -10,7 +10,7 @@ import BarreMetaNav from "./BarreMetaNav";
 import ModaleElement from "../Journal/ModaleElement";
 import PanneauSettings from "../PanneauSettings";
 
-const CarteOGF = dynamic(() => import("./CarteOGF"), { ssr: false });
+const CarteFond = dynamic(() => import("./CarteFond"), { ssr: false });
 
 interface ConfigModale {
   ouvert: boolean;
@@ -109,9 +109,9 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
   return (
     <div className="accueil-layout">
       {/* Carte OSM plein ecran */}
-      <CarteOGF>
+      <CarteFond>
         {navPreview && <TracePreview navigation={navPreview} />}
-      </CarteOGF>
+      </CarteFond>
 
       {/* Pills meta en haut de la carte */}
       {navPreview && <BarreMetaNav navigation={navPreview} onOuvrir={() => gererOuvrir(navPreview.id)} />}
