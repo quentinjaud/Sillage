@@ -186,9 +186,24 @@ model Navigation {
   traceId          String?        @unique
   trace            Trace?         @relation(fields: [traceId], references: [id], onDelete: SetNull)
   polylineCache    Json?
+  entreesJournal   EntreeJournal[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
   @@index([dossierId])
   @@index([userId])
+}
+
+model EntreeJournal {
+  id            String     @id @default(cuid())
+  navigationId  String
+  navigation    Navigation @relation(fields: [navigationId], references: [id], onDelete: Cascade)
+  timestamp     DateTime
+  lat           Float?
+  lon           Float?
+  texte         String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([navigationId])
 }

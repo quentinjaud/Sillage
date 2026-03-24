@@ -18,7 +18,8 @@ import { useEtatVue, HAUTEUR_GRAPHIQUE_INITIALE } from "@/lib/hooks/useEtatVue";
 import { useZoomTemporel } from "@/lib/hooks/useZoomTemporel";
 import { COULEURS } from "@/lib/theme";
 import BarreOutils from "@/components/BarreOutils";
-import { Share2, Pencil } from "lucide-react";
+import TimelineJournal from "@/components/Journal/TimelineJournal";
+import { Share2, Pencil, BookOpen, BarChart3 } from "lucide-react";
 
 /** Couleur d'accent par type de navigation */
 const ACCENT_PAR_TYPE: Record<string, string> = {
@@ -160,6 +161,7 @@ export default function NavigationVueClient({
     []
   );
 
+  const [modeVue, setModeVue] = useState<"perf" | "journal">("perf");
   const [ventDeploye, setVentDeploye] = useState(false);
   const [statsReduit, setStatsReduit] = useState(false);
   const [donneeVentDeployee, setDonneeVentDeployee] = useState<"vent" | "ventDirection">("vent");
@@ -281,6 +283,24 @@ export default function NavigationVueClient({
         />
       </div>
         <BarreOutils
+          toggle={
+            <div className="barre-outils-toggle">
+              <button
+                className={`barre-outils-toggle-btn${modeVue === "journal" ? " actif" : ""}`}
+                onClick={() => setModeVue("journal")}
+                title="Mode journal"
+              >
+                <BookOpen size={16} />
+              </button>
+              <button
+                className={`barre-outils-toggle-btn${modeVue === "perf" ? " actif" : ""}`}
+                onClick={() => setModeVue("perf")}
+                title="Mode performance"
+              >
+                <BarChart3 size={16} />
+              </button>
+            </div>
+          }
           actions={[
             {
               id: "partager",
@@ -372,28 +392,52 @@ export default function NavigationVueClient({
         </div>
       )}
 
-      {/* Graphique + timeline */}
+      {/* Zone C : graphique (perf) ou timeline (journal) */}
       <div className="trace-vue-graphique">
-        <GraphiqueRedimensionnable
-          hauteurInitiale={HAUTEUR_GRAPHIQUE_INITIALE}
-          hauteurMin={80}
-          hauteurMax={450}
-          onHauteurChange={handleHauteurChange}
-        >
-          <TraceChart
-            points={points}
-            donnee={donneeGraphee}
-            pointActifIndex={pointActifIndex}
-            pointFixeIndex={pointFixeIndex}
-            onHoverPoint={handleHoverPoint}
-            onClickPoint={handleClickPoint}
-            cellulesMeteo={cellulesMeteoState}
-            rangeDebut={debutZoom}
-            rangeFin={finZoom}
-            onRangeChange={setPlage}
-            onRangeReset={resetZoom}
+        {modeVue === "perf" ? (
+          <GraphiqueRedimensionnable
+            hauteurInitiale={HAUTEUR_GRAPHIQUE_INITIALE}
+            hauteurMin={80}
+            hauteurMax={450}
+            onHauteurChange={handleHauteurChange}
+          >
+            <TraceChart
+              points={points}
+              donnee={donneeGraphee}
+              pointActifIndex={pointActifIndex}
+              pointFixeIndex={pointFixeIndex}
+              onHoverPoint={handleHoverPoint}
+              onClickPoint={handleClickPoint}
+              cellulesMeteo={cellulesMeteoState}
+              rangeDebut={debutZoom}
+              rangeFin={finZoom}
+              onRangeChange={setPlage}
+              onRangeReset={resetZoom}
+            />
+          </GraphiqueRedimensionnable>
+        ) : (
+          <TimelineJournal
+            navigationId={navigationId}
+            onClickEntree={(ts, lat, lon) => {
+              // Trouver le point le plus proche du timestamp
+              const tMs = new Date(ts).getTime();
+              let meilleur = points[0];
+              let meilleurDiff = Infinity;
+              for (const p of points) {
+                if (!p.timestamp) continue;
+                const diff = Math.abs(new Date(p.timestamp).getTime() - tMs);
+                if (diff < meilleurDiff) {
+                  meilleurDiff = diff;
+                  meilleur = p;
+                }
+              }
+              if (meilleur) handleClickPoint(meilleur.pointIndex);
+            }}
+            pointActifTimestamp={pointActif?.timestamp ?? null}
+            pointActifLat={pointActif?.lat ?? null}
+            pointActifLon={pointActif?.lon ?? null}
           />
-        </GraphiqueRedimensionnable>
+        )}
       </div>
 
     </div>
