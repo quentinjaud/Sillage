@@ -3221,3 +3221,48 @@ body:has(.nettoyage-layout) .app-main {
 .carte-ogf-container .maplibregl-canvas {
   background: var(--background);
 }
+
+/* === Marqueurs dossiers === */
+.marqueur-dossier {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 253, 249, 0.92);
+  backdrop-filter: blur(8px);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.marqueur-dossier-actif {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 2px 12px rgba(246, 188, 0, 0.3);
+}
+
+.marqueur-dossier-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--border-light);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.marqueur-dossier-actif .marqueur-dossier-count {
+  background: var(--accent-yellow);
+  color: black;
+}
