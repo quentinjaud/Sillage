@@ -10,6 +10,7 @@ import RoseDesVents from "@/components/Map/RoseDesVents";
 import { trouverCelluleActive } from "@/lib/geo/stats-vent";
 import type { PointCarte, CelluleMeteoClient, StatsVent } from "@/lib/types";
 import { useEtatVue, HAUTEUR_GRAPHIQUE_INITIALE } from "@/lib/hooks/useEtatVue";
+import { useZoomTemporel } from "@/lib/hooks/useZoomTemporel";
 import BarreOutils from "@/components/BarreOutils";
 import { Eraser, Pencil, Link2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -53,6 +54,11 @@ export default function TraceVueClient({
     pointActif,
     handleHauteurChange,
   } = useEtatVue(points);
+
+  const {
+    debutZoom, finZoom, isZoomed, pointsFiltres,
+    setPlage, resetZoom,
+  } = useZoomTemporel(points);
 
   const [cellulesMeteoState, setCellulesMeteoState] = useState(cellulesMeteo ?? []);
   const [statsVentState, setStatsVentState] = useState(statsVent ?? null);
@@ -148,7 +154,7 @@ export default function TraceVueClient({
 
       <div className="trace-vue-carte">
         <TraceMapWrapper
-          points={points}
+          points={isZoomed ? pointsFiltres : points}
           maxSpeed={maxSpeed}
           paddingBottom={paddingBas}
           pointActifIndex={pointActifIndex}
@@ -223,6 +229,10 @@ export default function TraceVueClient({
             onHoverPoint={handleHoverPoint}
             onClickPoint={handleClickPoint}
             cellulesMeteo={cellulesMeteoState}
+            rangeDebut={debutZoom}
+            rangeFin={finZoom}
+            onRangeChange={setPlage}
+            onRangeReset={resetZoom}
           />
         </GraphiqueRedimensionnable>
       </div>

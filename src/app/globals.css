@@ -2713,6 +2713,95 @@ body {
   box-shadow: 0 0 0 2px var(--accent-yellow), 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 
+/* Range selection (zoom temporel) */
+.chart-range-highlight {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(246, 188, 0, 0.12);
+  border-left: 1px solid rgba(246, 188, 0, 0.4);
+  border-right: 1px solid rgba(246, 188, 0, 0.4);
+  pointer-events: none;
+}
+
+.chart-range-thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--accent);
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  cursor: ew-resize;
+  pointer-events: auto;
+  transition: box-shadow 0.15s;
+}
+
+.chart-range-thumb::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+.chart-range-thumb:hover {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.chart-range-thumb:active {
+  box-shadow: 0 0 0 2px var(--accent), 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* HUD zoom temporel */
+.chart-zoom-hud {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: rgba(255, 253, 249, 0.85);
+  padding: 2px 8px;
+  border-radius: 6px;
+  z-index: 5;
+}
+
+.chart-zoom-hud-arrow {
+  color: var(--accent);
+}
+
+.chart-zoom-hud-duree {
+  color: var(--text-light);
+}
+
+.chart-zoom-hud-reset {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 12px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.chart-zoom-hud-reset:hover {
+  background: var(--border-light);
+  color: var(--foreground);
+}
+
 /* === PanneauStats — point actif === */
 .panneau-stats-point-actif {
   display: flex;

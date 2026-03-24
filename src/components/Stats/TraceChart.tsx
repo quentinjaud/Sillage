@@ -33,6 +33,14 @@ interface PropsTraceChart {
   onClickPoint?: (pointIndex: number | null) => void;
   cellulesMeteo?: CelluleMeteoClient[];
   compact?: boolean;
+  /** Zoom temporel — timestamp debut en ms (optionnel) */
+  rangeDebut?: number | null;
+  /** Zoom temporel — timestamp fin en ms (optionnel) */
+  rangeFin?: number | null;
+  /** Callback quand la plage de zoom change */
+  onRangeChange?: (debut: number, fin: number) => void;
+  /** Reset le zoom */
+  onRangeReset?: () => void;
 }
 
 const CONFIG_DONNEES: Record<
@@ -92,6 +100,10 @@ export default function TraceChart({
   onClickPoint,
   cellulesMeteo,
   compact,
+  rangeDebut,
+  rangeFin,
+  onRangeChange,
+  onRangeReset,
 }: PropsTraceChart) {
   // Mode vent actif si donnee === "vent" ou "ventDirection" ET des cellules sont disponibles
   const modeVent = (donnee === "vent" || donnee === "ventDirection") && (cellulesMeteo?.length ?? 0) > 0;
@@ -284,6 +296,71 @@ export default function TraceChart({
     if (!d) return null;
     return ((d.temps - tempsDebut) / duree) * 100;
   }, [pointFixeIndex, donneesActives, tempsDebut, duree]);
+
+  // Positions des range thumbs pour le zoom temporel (en %)
+  const positionRangeDebut = useMemo(() => {
+    if (rangeDebut == null || duree === 0) return null;
+    return ((rangeDebut - tempsDebut) / duree) * 100;
+  }, [rangeDebut, tempsDebut, duree]);
+
+  const positionRangeFin = useMemo(() => {
+    if (rangeFin == null || duree === 0) return null;
+    return ((rangeFin - tempsDebut) / duree) * 100;
+  }, [rangeFin, tempsDebut, duree]);
+
+  // Drag generique pour les range thumbs
+  const deplacerRangeThumb = useCallback(
+    (clientX: number, which: "debut" | "fin") => {
+      if (!onRangeChange) return;
+      const conteneur = conteneurRef.current;
+      if (!conteneur) return;
+      const rect = conteneur.getBoundingClientRect();
+      const s = sliderStyle ?? { left: 30, right: 5 };
+      const zoneGauche = rect.left + s.left;
+      const zoneDroite = rect.right - s.right;
+      const largeurZone = zoneDroite - zoneGauche;
+      const ratio = Math.max(0, Math.min(1, (clientX - zoneGauche) / largeurZone));
+      const temps = tempsDebut + ratio * duree;
+      if (which === "debut") {
+        onRangeChange(temps, rangeFin ?? tempsDebut + duree);
+      } else {
+        onRangeChange(rangeDebut ?? tempsDebut, temps);
+      }
+    },
+    [onRangeChange, sliderStyle, tempsDebut, duree, rangeDebut, rangeFin]
+  );
+
+  const handleRangeThumbMouseDown = useCallback(
+    (which: "debut" | "fin") => (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const handleMove = (ev: MouseEvent) => deplacerRangeThumb(ev.clientX, which);
+      const handleUp = () => {
+        document.removeEventListener("mousemove", handleMove);
+        document.removeEventListener("mouseup", handleUp);
+      };
+      document.addEventListener("mousemove", handleMove);
+      document.addEventListener("mouseup", handleUp);
+    },
+    [deplacerRangeThumb]
+  );
+
+  const handleRangeThumbTouchStart = useCallback(
+    (which: "debut" | "fin") => (e: React.TouchEvent) => {
+      e.stopPropagation();
+      const handleMove = (ev: TouchEvent) => {
+        ev.preventDefault();
+        deplacerRangeThumb(ev.touches[0].clientX, which);
+      };
+      const handleEnd = () => {
+        document.removeEventListener("touchmove", handleMove);
+        document.removeEventListener("touchend", handleEnd);
+      };
+      document.addEventListener("touchmove", handleMove, { passive: false });
+      document.addEventListener("touchend", handleEnd);
+    },
+    [deplacerRangeThumb]
+  );
 
   // Position et contenu du tooltip actif (toujours nav + vent si dispo)
   const tooltipActif = useMemo(() => {
@@ -487,7 +564,7 @@ export default function TraceChart({
   const formaterActif = modeTWA ? ((v: number) => `${Math.round(v)}°`) : modeVent ? configVentActif.formater : config.formater;
 
   return (
-    <div className={`chart-container${compact ? " chart-container--compact" : ""}`} ref={conteneurRef} onTouchStart={handleTouchChart}>
+    <div className={`chart-container${compact ? " chart-container--compact" : ""}`} ref={conteneurRef} onTouchStart={handleTouchChart} onDoubleClick={onRangeReset}>
       {!compact && <h3 className="chart-title">{titreActif}</h3>}
       {compact && <span className="chart-title-compact">{titreActif}</span>}
       <ResponsiveContainer width="100%" height="100%">
@@ -571,7 +648,47 @@ export default function TraceChart({
             />
           </>
         )}
+
+        {/* Range selection (zoom temporel) */}
+        {positionRangeDebut != null && positionRangeFin != null && (
+          <>
+            <div
+              className="chart-range-highlight"
+              style={{
+                left: `${Math.min(positionRangeDebut, positionRangeFin)}%`,
+                width: `${Math.abs(positionRangeFin - positionRangeDebut)}%`,
+              }}
+            />
+            <div
+              className="chart-range-thumb chart-range-thumb--debut"
+              style={{ left: `${positionRangeDebut}%` }}
+              onMouseDown={handleRangeThumbMouseDown("debut")}
+              onTouchStart={handleRangeThumbTouchStart("debut")}
+            />
+            <div
+              className="chart-range-thumb chart-range-thumb--fin"
+              style={{ left: `${positionRangeFin}%` }}
+              onMouseDown={handleRangeThumbMouseDown("fin")}
+              onTouchStart={handleRangeThumbTouchStart("fin")}
+            />
+          </>
+        )}
       </div>
+
+      {/* HUD zoom temporel */}
+      {rangeDebut != null && rangeFin != null && onRangeReset && (
+        <div className="chart-zoom-hud">
+          <span>{format(new Date(Math.min(rangeDebut, rangeFin)), "HH:mm")}</span>
+          <span className="chart-zoom-hud-arrow">→</span>
+          <span>{format(new Date(Math.max(rangeDebut, rangeFin)), "HH:mm")}</span>
+          <span className="chart-zoom-hud-duree">
+            ({Math.round(Math.abs(rangeFin - rangeDebut) / 60000)} min)
+          </span>
+          <button className="chart-zoom-hud-reset" onClick={onRangeReset} title="Reinitialiser le zoom">
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Tooltip custom — positionne via pointActifIndex, visible sur les deux graphs */}
       {tooltipActif && (() => {
