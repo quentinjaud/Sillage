@@ -8,6 +8,7 @@ import MarqueurDossier from "./MarqueurDossier";
 import PanneauContenu from "./PanneauContenu";
 import ProjectionTrace from "./ProjectionTrace";
 import ModaleElement from "../Journal/ModaleElement";
+import PanneauSettings from "../PanneauSettings";
 
 const CarteOGF = dynamic(() => import("./CarteOGF"), { ssr: false });
 
@@ -30,6 +31,7 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
   const [dossierActif, setDossierActif] = useState<string | null>(null);
   const [navPreview, setNavPreview] = useState<ResumeNavigation | null>(null);
   const [modale, setModale] = useState<ConfigModale>(MODALE_FERMEE);
+  const [settingsOuvert, setSettingsOuvert] = useState(false);
 
   const dossierSelectionne = dossiers.find((d) => d.id === dossierActif);
 
@@ -146,10 +148,18 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
 
       {dossiers.length === 0 && (
         <div className="panneau-onboarding">
-          <h2>Bienvenue sur Sillage</h2>
-          <p>Placez votre premier port d attache pour commencer.</p>
-          <button className="btn-principal" onClick={() => {}}>
-            Creer un dossier
+          <h2>Bienvenue Marin !</h2>
+          <p>
+            Place ton premier port d&apos;attache pour commencer a tracer des
+            sillages.
+          </p>
+          <button
+            className="btn-principal"
+            onClick={() =>
+              setModale({ ouvert: true, type: "dossier" })
+            }
+          >
+            Creer mon premier dossier
           </button>
         </div>
       )}
@@ -157,10 +167,15 @@ export default function PageAccueil({ dossiers }: PropsPageAccueil) {
       <button
         className="btn-settings-accueil"
         title="Parametres"
-        onClick={() => {}}
+        onClick={() => setSettingsOuvert(true)}
       >
         ⚙
       </button>
+
+      <PanneauSettings
+        ouvert={settingsOuvert}
+        onFermer={() => setSettingsOuvert(false)}
+      />
 
       <ModaleElement
         ouvert={modale.ouvert}

@@ -5,7 +5,7 @@ import { journalErreur } from "@/lib/journal";
 import { prochainPointSnap, NOM_DOSSIER_DEFAUT, POSITION_DOSSIER_DEFAUT } from "@/lib/pointsSnap";
 import type { ResumeDossier } from "@/lib/types";
 
-export async function GET(_requete: NextRequest) {
+export async function GET(requete: NextRequest) {
   const session = await obtenirSession();
   if (!session) {
     return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
@@ -31,8 +31,10 @@ export async function GET(_requete: NextRequest) {
       });
     }
 
+    const tousLesDossiers = requete.nextUrl.searchParams.get("tous") === "1";
+
     const dossiers = await prisma.dossier.findMany({
-      where: { userId, parentId: null },
+      where: tousLesDossiers ? { userId } : { userId, parentId: null },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
