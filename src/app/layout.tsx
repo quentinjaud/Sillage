@@ -4,6 +4,8 @@ import { MantineWrapper } from "@/components/MantineProvider";
 import { MenuUtilisateur } from "@/components/MenuUtilisateur";
 import { BoutonAccueil } from "@/components/BoutonAccueil";
 import { BandeauImpersonation } from "@/components/BandeauImpersonation";
+import { PanneauProvider } from "@/lib/contexts/PanneauContext";
+import PanneauFlottantRendu from "@/components/Panneaux/PanneauFlottantRendu";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "./globals.css";
 
@@ -31,10 +33,13 @@ export default function RootLayout({
       </head>
       <body>
         <MantineWrapper>
-          <BandeauImpersonation />
-          <BoutonAccueil />
-          <MenuUtilisateur />
-          {children}
+          <PanneauProvider>
+            <BandeauImpersonation />
+            <BoutonAccueil />
+            <MenuUtilisateur />
+            <PanneauFlottantRendu />
+            {children}
+          </PanneauProvider>
         </MantineWrapper>
       </body>
     </html>

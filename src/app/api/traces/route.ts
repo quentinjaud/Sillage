@@ -57,6 +57,8 @@ export async function GET() {
       durationSeconds: true,
       avgSpeedKn: true,
       maxSpeedKn: true,
+      bateauId: true,
+      bateau: { select: { id: true, nom: true } },
     },
   });
 

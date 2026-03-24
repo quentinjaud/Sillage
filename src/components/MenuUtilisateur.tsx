@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Menu, UnstyledButton } from "@mantine/core";
-import { User } from "lucide-react";
+import { User, Settings } from "lucide-react";
+import { usePanneau } from "@/lib/contexts/PanneauContext";
 
 export function MenuUtilisateur() {
   const routeur = useRouter();
   const { data: session, isPending } = useSession();
+  const { ouvrirPanneau } = usePanneau();
 
   if (isPending || !session) return null;
 
@@ -24,11 +26,15 @@ export function MenuUtilisateur() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Label>{session.user.name}</Menu.Label>
-          <Menu.Item component={Link} href="/traces">
+          <Menu.Item onClick={() => ouvrirPanneau("traces")}>
             Mes traces
           </Menu.Item>
-          <Menu.Item component={Link} href="/bateaux">
+          <Menu.Item onClick={() => ouvrirPanneau("bateaux")}>
             Mes bateaux
+          </Menu.Item>
+          <Menu.Item onClick={() => ouvrirPanneau("preferences")}>
+            <Settings size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+            Preferences
           </Menu.Item>
           {estAdmin && (
             <>
