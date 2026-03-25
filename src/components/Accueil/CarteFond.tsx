@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, type ReactNode } from "react";
+import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import Map, { Marker, type MapRef } from "react-map-gl/maplibre";
 import type { MapLayerMouseEvent } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -22,11 +22,21 @@ export default function CarteFond({
   children,
   centreLat,
   centreLon,
-  portAttacheLat,
-  portAttacheLon,
+  portAttacheLat: portAttacheLatProp,
+  portAttacheLon: portAttacheLonProp,
 }: PropsCarteFond) {
   const mapRef = useRef<MapRef>(null);
   const { modePortAttache, setModePortAttache } = usePanneau();
+  // Etat local pour maj immediat du marqueur apres clic (sans attendre refresh serveur)
+  const [portLocal, setPortLocal] = useState<{ lat: number; lon: number } | null>(null);
+  const portAttacheLat = portLocal?.lat ?? portAttacheLatProp;
+  const portAttacheLon = portLocal?.lon ?? portAttacheLonProp;
+
+  // Ref pour acceder a la valeur courante de modePortAttache dans le handler
+  // (react-map-gl ne re-bind pas toujours onClick quand la ref change)
+  const modePortAttacheRef = useRef(modePortAttache);
+  modePortAttacheRef.current = modePortAttache;
+
   const styleCarte = useMemo(
     () => creerStyleCarte({ desaturation: true, openseamap: false }),
     []
@@ -43,9 +53,13 @@ export default function CarteFond({
 
   const handleClick = useCallback(
     async (e: MapLayerMouseEvent) => {
-      if (!modePortAttache) return;
+      if (!modePortAttacheRef.current) return;
 
       const { lat, lng } = e.lngLat;
+      // Maj locale immediate
+      setPortLocal({ lat, lon: lng });
+      setModePortAttache(false);
+
       try {
         await fetch("/api/user/preferences", {
           method: "PATCH",
@@ -56,11 +70,11 @@ export default function CarteFond({
           }),
         });
       } catch {
-        // silencieux
+        // rollback si erreur
+        setPortLocal(null);
       }
-      setModePortAttache(false);
     },
-    [modePortAttache, setModePortAttache]
+    [setModePortAttache]
   );
 
   return (
