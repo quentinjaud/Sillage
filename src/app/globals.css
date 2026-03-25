@@ -4107,3 +4107,515 @@ body {
   color: var(--text-light);
   font-size: 11px;
 }
+
+/* ============================================= */
+/* === Editeur de polaires === */
+/* ============================================= */
+
+/* -- Variables locales polaires -- */
+.polaires-editeur,
+.polaires-toolbar,
+.polaires-avertissements {
+  --pol-bg-alt: #f5f3ef;
+  --pol-cell-hover: #e8f4f8;
+  --pol-cell-active: #d0eaf3;
+  --pol-cell-invalid: #fdd;
+  --pol-warning-bg: #fff3cd;
+  --pol-warning-border: #ffc107;
+  --pol-warning-text: #856404;
+}
+
+/* -- Toolbar -- */
+
+.polaires-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: white;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.polaires-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.polaires-toolbar__back {
+  display: flex;
+  line-height: 0;
+  opacity: 0.9;
+  transition: opacity 0.15s;
+}
+.polaires-toolbar__back:hover {
+  opacity: 1;
+}
+
+.polaires-toolbar__title {
+  font-size: 1.1em;
+  font-weight: 700;
+}
+
+.polaires-toolbar__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* -- Boutons -- */
+
+.polaires-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  min-height: 44px;
+  min-width: 44px;
+}
+.polaires-btn:hover {
+  opacity: 0.9;
+}
+
+.polaires-btn--primary {
+  background: white;
+  color: var(--accent);
+}
+
+.polaires-btn--secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.polaires-btn--small {
+  padding: 6px 12px;
+  font-size: 0.85em;
+  background: var(--pol-bg-alt);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  min-height: 36px;
+}
+.polaires-btn--small:hover {
+  background: var(--border);
+}
+
+/* -- Select reference -- */
+
+.polaires-select-ref {
+  padding: 5px 10px;
+  font-size: 0.8em;
+  font-family: inherit;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  max-width: 180px;
+  min-height: 44px;
+}
+.polaires-select-ref option {
+  color: var(--foreground);
+  background: white;
+  font-weight: 200;
+}
+.polaires-select-ref:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+/* -- Avertissements -- */
+
+.polaires-avertissements {
+  padding: 10px 20px;
+  background: var(--pol-warning-bg);
+  border-bottom: 2px solid var(--pol-warning-border);
+  color: var(--pol-warning-text);
+  font-size: 0.9em;
+}
+.polaires-avertissements ul {
+  margin: 4px 0 0 20px;
+}
+
+/* -- Layout editeur -- */
+
+.polaires-editeur {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  height: calc(100vh - 58px);
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.polaires-editeur__chart {
+  position: sticky;
+  top: 0;
+  width: 380px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+}
+
+.polaires-editeur__table {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* -- Tableau polaire -- */
+
+.polaires-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85em;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: white;
+}
+
+.polaires-table th,
+.polaires-table td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  text-align: center;
+  min-width: 52px;
+  position: relative;
+}
+
+.polaires-table th {
+  background: var(--pol-bg-alt);
+  font-weight: 700;
+}
+
+.polaires-table th.corner {
+  background: var(--accent);
+  color: white;
+  text-align: center;
+  font-size: 0.8em;
+}
+
+/* Colonne TWA (premiere colonne) */
+.polaires-table td:first-child {
+  background: var(--pol-bg-alt);
+  font-weight: 700;
+}
+
+/* -- Inputs dans les cellules -- */
+
+.polaires-cell-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  outline: none;
+  transition: background 0.15s;
+}
+.polaires-cell-input:hover {
+  background: var(--pol-cell-hover);
+}
+.polaires-cell-input:focus {
+  background: var(--pol-cell-active);
+}
+
+/* Cellule dimmed (TWS masque) */
+.polaires-table th.dimmed,
+.polaires-table td.dimmed {
+  color: var(--border);
+}
+
+/* Cellule invalide */
+.polaires-table td.invalid {
+  background: var(--pol-cell-invalid) !important;
+  animation: polaires-flash 0.4s;
+}
+
+@keyframes polaires-flash {
+  0%, 100% { background: var(--pol-cell-invalid); }
+  50% { background: #faa; }
+}
+
+/* -- Mode reference : absolu -- */
+
+.polaires-ref-absolu .polaires-ref-value {
+  display: block;
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  line-height: 1;
+  margin-top: 1px;
+}
+
+/* -- Mode reference : delta -- */
+
+.polaires-ref-delta .polaires-delta {
+  display: block;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 1px;
+}
+.polaires-ref-delta .polaires-delta[data-delta-sign="faster"] {
+  color: var(--accent-green);
+}
+.polaires-ref-delta .polaires-delta[data-delta-sign="slower"] {
+  color: var(--danger);
+}
+.polaires-ref-delta .polaires-delta[data-delta-sign="equal"] {
+  color: var(--text-secondary);
+}
+
+/* -- Bouton de suppression (croix dans en-tete/cellule TWA) -- */
+
+.polaires-btn--del {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  padding: 0 4px;
+  line-height: 1.2;
+  font-size: 0.75em;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.polaires-btn--del:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Afficher au survol de la ligne/colonne */
+.polaires-table tr:hover .polaires-btn--del,
+.polaires-table th:hover .polaires-btn--del {
+  opacity: 1;
+}
+
+/* -- Actions sous le tableau -- */
+
+.polaires-table-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+/* -- Toggle absolu / delta -- */
+
+.polaires-ref-toggle {
+  margin-left: auto;
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.polaires-ref-toggle__btn {
+  border: none;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8em;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.polaires-ref-toggle__btn--active {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* -- Conteneur diagramme polaire -- */
+
+.diagramme-polaire-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.diagramme-polaire-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+.diagramme-polaire-svg:active {
+  cursor: grabbing;
+}
+
+/* -- Tooltip polaire -- */
+
+.polaires-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(44, 44, 44, 0.9);
+  color: white;
+  font-size: 0.8em;
+  line-height: 1.5;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  z-index: 10;
+}
+
+.polaires-tooltip .tooltip-apparent {
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+
+.polaires-tooltip .tooltip-ref {
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+.polaires-tooltip .tooltip-faster {
+  color: #81c784;
+}
+.polaires-tooltip .tooltip-slower {
+  color: #ef9a9a;
+}
+
+/* -- Legende polaire -- */
+
+.polaires-legende {
+  margin-top: 8px;
+  font-size: 0.75em;
+  flex-shrink: 0;
+}
+
+.polaires-legende__controls {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.polaires-legende__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  justify-content: center;
+}
+
+.polaires-legende__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.polaires-legende__item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.polaires-legende__color {
+  width: 16px;
+  height: 3px;
+  border-radius: 1px;
+}
+
+.polaires-legende__color--apparent {
+  background: none !important;
+  width: 20px;
+  height: 4px;
+}
+
+.polaires-legende__ref {
+  text-align: center;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* -- Classes SVG polaire (non prefixees, dans le SVG uniquement) -- */
+
+.grid-circle {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 0.5;
+}
+
+.grid-line {
+  stroke: var(--border);
+  stroke-width: 0.3;
+}
+
+.grid-label {
+  font-size: 8px;
+  fill: var(--text-secondary);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.speed-label {
+  font-size: 6px;
+  fill: var(--text-secondary);
+  text-anchor: start;
+  dominant-baseline: auto;
+}
+
+.polar-curve {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.polar-curve:hover {
+  stroke-width: 3;
+}
+
+.polar-curve--ref {
+  stroke: rgba(0, 0, 0, 0.2);
+  stroke-width: 1;
+}
+
+.polar-curve--apparent {
+  stroke-dasharray: 0.1 3;
+  stroke-linecap: round;
+  stroke-width: 1.2;
+  opacity: 0.7;
+}
+
+.polar-dot {
+  fill: transparent;
+  stroke: none;
+  cursor: pointer;
+}
+.polar-dot.active {
+  fill: var(--foreground);
+  stroke: white;
+  stroke-width: 0.8;
+}
