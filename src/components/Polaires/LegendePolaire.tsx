@@ -11,6 +11,54 @@ interface PropsLegende {
   dispatch: React.Dispatch<ActionEditeur>;
 }
 
+export function SidebarTWS({
+  tws,
+  visibleTWS,
+  montrerApparent,
+  dispatch,
+}: Pick<PropsLegende, 'tws' | 'visibleTWS' | 'montrerApparent' | 'dispatch'>) {
+  return (
+    <div className="polaires-legende__sidebar">
+      {tws.map((v, ci) => {
+        if (v === 0) return null;
+        const couleur = COULEURS_TWS[ci % COULEURS_TWS.length];
+        const actif = visibleTWS.has(ci);
+        return (
+          <span
+            key={ci}
+            className={`polaires-legende__tws${actif ? ' polaires-legende__tws--actif' : ''}`}
+            style={actif ? { color: couleur } : undefined}
+            onClick={() => dispatch({ type: 'TOGGLE_TWS', ci })}
+          >
+            <span className="polaires-legende__tiret" style={{ background: couleur }} />
+            {v}
+          </span>
+        );
+      })}
+      <div className="polaires-legende__sidebar-controls">
+        <span
+          className="polaires-legende__tws polaires-legende__tws--ctrl"
+          onClick={() => dispatch({ type: 'TOUT_TWS' })}
+        >
+          Tout
+        </span>
+        <span
+          className="polaires-legende__tws polaires-legende__tws--ctrl"
+          onClick={() => dispatch({ type: 'AUCUN_TWS' })}
+        >
+          Aucun
+        </span>
+        <span
+          className={`polaires-legende__tws polaires-legende__tws--ctrl${montrerApparent ? ' polaires-legende__tws--actif' : ''}`}
+          onClick={() => dispatch({ type: 'TOGGLE_APPARENT' })}
+        >
+          App.
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function LegendePolaire({
   tws,
   visibleTWS,
@@ -22,13 +70,13 @@ export default function LegendePolaire({
     <div className="polaires-legende">
       <div className="polaires-legende__controls">
         <button
-          className="polaires-btn polaires-btn--small"
+          className="polaires-pill polaires-pill--small"
           onClick={() => dispatch({ type: 'TOUT_TWS' })}
         >
           Tout
         </button>
         <button
-          className="polaires-btn polaires-btn--small"
+          className="polaires-pill polaires-pill--small"
           onClick={() => dispatch({ type: 'AUCUN_TWS' })}
         >
           Aucun
@@ -53,27 +101,6 @@ export default function LegendePolaire({
           </svg>
           Apparent
         </label>
-      </div>
-
-      <div className="polaires-legende__items">
-        {tws.map((v, ci) => {
-          if (v === 0) return null;
-          const couleur = COULEURS_TWS[ci % COULEURS_TWS.length];
-          return (
-            <label key={ci} className="polaires-legende__item">
-              <input
-                type="checkbox"
-                checked={visibleTWS.has(ci)}
-                onChange={() => dispatch({ type: 'TOGGLE_TWS', ci })}
-              />
-              <span
-                className="polaires-legende__color"
-                style={{ background: couleur }}
-              />
-              {v} kn
-            </label>
-          );
-        })}
       </div>
 
       {refPolaire && (

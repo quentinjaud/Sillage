@@ -6,7 +6,7 @@ export const COULEURS_TWS = [
   '#3F51B5', '#795548', '#607D8B',
 ];
 
-export const VIEWBOX_DEFAUT = { x: -40, y: -250, w: 290, h: 500 };
+export const VIEWBOX_DEFAUT = { x: -15, y: -250, w: 265, h: 500 };
 
 export const SCALE_RADIUS = 210;
 

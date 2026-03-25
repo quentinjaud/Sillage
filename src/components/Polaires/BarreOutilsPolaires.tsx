@@ -7,7 +7,6 @@ import { parsePOL, exportPOL, validerNavimetrix } from '@/lib/polaires/parseur-p
 interface PropsBarreOutils {
   nom: string;
   refPolaire: PolaireReference | null;
-  modeRef: 'absolu' | 'delta';
   avertissements: string[];
   donnees: DonneesPolaire;
   dispatch: React.Dispatch<ActionEditeur>;
@@ -16,7 +15,6 @@ interface PropsBarreOutils {
 export default function BarreOutilsPolaires({
   nom,
   refPolaire,
-  modeRef,
   avertissements,
   donnees,
   dispatch,
@@ -132,33 +130,6 @@ export default function BarreOutilsPolaires({
     <>
       <div className="polaires-toolbar">
         <div className="polaires-toolbar__left">
-          <a href="/journal" className="polaires-toolbar__back" title="Retour">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-              <defs>
-                <linearGradient id="sq-polaires" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#43728B" />
-                  <stop offset="20%" stopColor="#43728B" />
-                  <stop offset="50%" stopColor="#D32F2F" />
-                  <stop offset="80%" stopColor="#F6BC00" />
-                  <stop offset="100%" stopColor="#F6BC00" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2"
-                stroke="white"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2"
-                stroke="url(#sq-polaires)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
           <span className="polaires-toolbar__title">Editeur de polaires</span>
         </div>
 
@@ -208,23 +179,6 @@ export default function BarreOutilsPolaires({
             Exporter .pol
           </button>
 
-          {/* Toggle absolu / delta */}
-          {refPolaire && (
-            <div className="polaires-ref-toggle">
-              <button
-                className={`polaires-ref-toggle__btn${modeRef === 'absolu' ? ' polaires-ref-toggle__btn--active' : ''}`}
-                onClick={() => dispatch({ type: 'MODE_REF', mode: 'absolu' })}
-              >
-                Absolu
-              </button>
-              <button
-                className={`polaires-ref-toggle__btn${modeRef === 'delta' ? ' polaires-ref-toggle__btn--active' : ''}`}
-                onClick={() => dispatch({ type: 'MODE_REF', mode: 'delta' })}
-              >
-                &plusmn;&Delta;
-              </button>
-            </div>
-          )}
         </div>
       </div>
 

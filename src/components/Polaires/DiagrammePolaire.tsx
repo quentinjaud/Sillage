@@ -74,7 +74,9 @@ const STYLES = `
   opacity: 0.5;
 }
 .polar-curve--apparent {
-  stroke-dasharray: 4 3;
+  stroke-dasharray: 0.1 3;
+  stroke-linecap: round;
+  stroke-width: 1.2;
   opacity: 0.6;
 }
 .polar-dot {

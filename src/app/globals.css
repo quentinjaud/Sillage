@@ -4114,7 +4114,6 @@ body {
 
 /* -- Variables locales polaires -- */
 .polaires-editeur,
-.polaires-toolbar,
 .polaires-avertissements {
   --pol-bg-alt: #f5f3ef;
   --pol-cell-hover: #e8f4f8;
@@ -4125,44 +4124,54 @@ body {
   --pol-warning-text: #856404;
 }
 
-/* -- Toolbar -- */
+/* -- Pills (au-dessus du tableau) -- */
 
-.polaires-toolbar {
+.polaires-pills {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
+  gap: 8px;
+  flex-wrap: nowrap;
+  margin-bottom: 12px;
+}
+
+.polaires-pill {
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: white;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  min-height: 36px;
+}
+.polaires-pill:hover {
   background: var(--accent);
   color: white;
-  flex-wrap: wrap;
-  gap: 8px;
+}
+.polaires-pill--jaune {
+  border-color: #F6BC00;
+  color: #a07a00;
+}
+.polaires-pill--jaune:hover {
+  background: #F6BC00;
+  color: white;
 }
 
-.polaires-toolbar__left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.polaires-pill--select option {
+  background: white;
+  color: var(--foreground);
+  font-weight: 200;
 }
 
-.polaires-toolbar__back {
-  display: flex;
-  line-height: 0;
-  opacity: 0.9;
-  transition: opacity 0.15s;
-}
-.polaires-toolbar__back:hover {
-  opacity: 1;
-}
-
-.polaires-toolbar__title {
-  font-size: 1.1em;
-  font-weight: 700;
-}
-
-.polaires-toolbar__actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.polaires-pill--select {
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
 /* -- Boutons -- */
@@ -4191,6 +4200,12 @@ body {
 .polaires-btn--secondary {
   background: rgba(255, 255, 255, 0.2);
   color: white;
+}
+
+.polaires-pill--small {
+  font-size: 0.85em;
+  padding: 4px 12px;
+  min-height: 32px;
 }
 
 .polaires-btn--small {
@@ -4248,26 +4263,57 @@ body {
   display: flex;
   gap: 20px;
   padding: 20px;
-  height: calc(100vh - 58px);
-  align-items: flex-start;
+  height: 100vh;
+  align-items: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .polaires-editeur__chart {
-  position: sticky;
-  top: 0;
-  width: 380px;
-  flex-shrink: 0;
-  height: 100%;
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
-  padding-top: 12px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.polaires-resize-handle {
+  width: 12px;
+  margin: 0 -3px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  touch-action: none;
+  align-self: stretch;
+}
+.polaires-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 32px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.15s;
+}
+.polaires-resize-handle:hover::after,
+.polaires-resize-handle:active::after {
+  background: var(--accent);
+}
+.polaires-editeur__chart-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
 .polaires-editeur__table {
-  flex: 1;
+  flex: 1 1 70%;
   min-width: 0;
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 /* -- Tableau polaire -- */
@@ -4275,7 +4321,8 @@ body {
 .polaires-table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.85em;
+  table-layout: fixed;
+  font-size: clamp(0.55em, 1.1vw, 0.85em);
   white-space: nowrap;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -4284,11 +4331,11 @@ body {
 
 .polaires-table th,
 .polaires-table td {
-  padding: 6px 10px;
+  padding: clamp(1px, 0.4vh, 4px) 2px;
   border: 1px solid var(--border);
   text-align: center;
-  min-width: 52px;
   position: relative;
+  overflow: hidden;
 }
 
 .polaires-table th {
@@ -4332,7 +4379,14 @@ body {
 /* Cellule dimmed (TWS masque) */
 .polaires-table th.dimmed,
 .polaires-table td.dimmed {
-  color: var(--border);
+  color: #ccc;
+}
+.polaires-table td.dimmed .polaires-cell-input {
+  color: #ccc;
+}
+.polaires-table td.dimmed .polaires-ref-value,
+.polaires-table td.dimmed .polaires-delta {
+  color: #ddd;
 }
 
 /* Cellule invalide */
@@ -4379,27 +4433,25 @@ body {
 
 .polaires-btn--del {
   position: absolute;
-  top: 1px;
-  right: 1px;
-  padding: 0 4px;
-  line-height: 1.2;
-  font-size: 0.75em;
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  top: 2px;
+  right: 2px;
+  padding: 0;
+  font-size: 0.6em;
+  background: none;
+  color: #ccc;
+  border: none;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s, color 0.15s;
-  min-width: 24px;
-  min-height: 24px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 .polaires-btn--del:hover {
   color: var(--danger);
-  border-color: var(--danger);
 }
 
 /* Afficher au survol de la ligne/colonne */
@@ -4412,6 +4464,7 @@ body {
 
 .polaires-table-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
   align-items: center;
@@ -4420,32 +4473,35 @@ body {
 /* -- Toggle absolu / delta -- */
 
 .polaires-ref-toggle {
-  margin-left: auto;
   display: flex;
-  gap: 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   overflow: hidden;
+  height: 32px;
 }
 
 .polaires-ref-toggle__btn {
   border: none;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.8em;
+  background: white;
+  color: var(--text-secondary);
+  font-size: 0.85em;
   font-family: inherit;
-  font-weight: 700;
-  padding: 4px 10px;
+  font-weight: 300;
+  padding: 0 12px;
   cursor: pointer;
-  min-height: 44px;
   min-width: 44px;
   transition: background 0.15s, color 0.15s;
 }
 
+.polaires-ref-toggle__btn:hover {
+  background: #f0f0f0;
+}
+
 .polaires-ref-toggle__btn--active {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--accent-blue, #43728B);
   color: white;
+  font-weight: 500;
 }
 
 /* -- Conteneur diagramme polaire -- */
@@ -4453,9 +4509,8 @@ body {
 .diagramme-polaire-container {
   position: relative;
   width: 100%;
-  height: 100%;
-  flex: 1;
-  min-height: 0;
+  max-height: 70vh;
+  aspect-ratio: 3 / 5;
 }
 
 .diagramme-polaire-svg {
@@ -4503,6 +4558,31 @@ body {
 
 /* -- Legende polaire -- */
 
+.polaires-legende__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.7em;
+  flex-shrink: 0;
+  width: 48px;
+}
+.polaires-legende__sidebar-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.polaires-legende__tws--ctrl {
+  font-weight: 400;
+  color: var(--foreground);
+  cursor: pointer;
+}
+.polaires-legende__tws--ctrl.polaires-legende__tws--actif {
+  font-weight: 600;
+}
+
 .polaires-legende {
   margin-top: 8px;
   font-size: 0.75em;
@@ -4543,6 +4623,30 @@ body {
   width: 16px;
   height: 3px;
   border-radius: 1px;
+}
+
+.polaires-legende__tws {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 200;
+  color: #bbb;
+  transition: color 0.15s;
+}
+.polaires-legende__tws--actif {
+  font-weight: 300;
+  filter: brightness(0.7);
+}
+.polaires-legende__tiret {
+  width: 16px;
+  height: 3px;
+  border-radius: 1px;
+  display: inline-block;
+}
+.polaires-legende__tws:not(.polaires-legende__tws--actif) .polaires-legende__tiret {
+  opacity: 0.3;
 }
 
 .polaires-legende__color--apparent {
@@ -4606,7 +4710,7 @@ body {
   stroke-dasharray: 0.1 3;
   stroke-linecap: round;
   stroke-width: 1.2;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .polar-dot {
