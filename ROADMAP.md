@@ -242,6 +242,18 @@ User
 
 ---
 
+## Références inspirantes
+
+- **Navygatio** — journal de bord, organisation par navigations, events géolocalisés : https://navygatio.firebaseapp.com/
+- **ChartedSails** — analyse de performance voile, VMG, legs, polaires : https://www.chartedsails.com/
+- **NavimetriX (gserv viewer)** — visualisation de traces GPX, instruments NMEA : https://gserv.navimetrix.com/track_gpx_viewer/viewer.html
+- **TravelMap** — assemblage de traces en vue aventure/voyage : https://travelmap.net/
+  - Timeline verticale d'etapes (dots chronologiques, dates, photos, notes depliables par escale)
+  - Carte recap avec segments entre etapes, legende par mode de transport
+  - Pattern cible pour la vue Aventure de Sillage : navigations assemblees sur carte + timeline escales
+
+---
+
 ## Décisions techniques
 
 - **Stack** : Next.js 16 + React 19 + TypeScript + Mantine + CSS vanilla

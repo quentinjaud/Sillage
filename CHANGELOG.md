@@ -1,5 +1,20 @@
 # Sillage — Changelog
 
+## v0.6.2 — Editeur de polaires standalone + references roadmap (2026-03-25)
+
+### Editeur de polaires (`src/polaires-standalone/`)
+- Outil standalone HTML/CSS/JS — visualisation et edition de polaires au format .POL (NavimetriX)
+- Diagramme polaire SVG interactif avec courbes par TWS, legende cliquable
+- Tableau editable (TWA x TWS) avec ajout/suppression de lignes et colonnes
+- Import/export fichiers .POL
+- Bibliotheque de 496 polaires de reference integree (`polarlib/`)
+- Comparaison avec polaire de reference (mode absolu / delta)
+- Support vent apparent (TWA → AWA)
+- Charte Sillage (Atkinson Hyperlegible, palette jaune/bleu/creme)
+
+### Roadmap
+- Ajout section "References inspirantes" (Navygatio, ChartedSails, NavimetriX, TravelMap)
+
 ## v0.6.1 — Session nuit : refactorings, panneaux, UX (2026-03-25)
 
 ### Refactorings techniques

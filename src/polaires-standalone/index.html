@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Polaires - Origami</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="polaires.css" />
+</head>
+<body>
+  <header class="toolbar">
+    <div class="toolbar__left">
+      <a href="/" class="toolbar__back" title="Retour">&#8592;</a>
+      <h1 class="toolbar__title">Editeur de polaires</h1>
+    </div>
+    <div class="toolbar__actions">
+      <select id="select-ref" class="select-ref">
+        <option value="">Comparer…</option>
+      </select>
+      <button id="btn-import" class="btn btn--secondary">Importer .pol</button>
+      <button id="btn-export" class="btn btn--primary">Exporter .pol</button>
+      <input type="file" id="file-input" accept=".pol,.txt" hidden />
+      <input type="file" id="file-input-ref" accept=".pol,.txt" hidden />
+    </div>
+  </header>
+
+  <div id="warnings" class="warnings" hidden></div>
+
+  <main class="editor">
+    <section class="editor__chart">
+      <div class="chart-container">
+        <svg id="polar-chart" viewBox="-40 -250 290 500" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+      </div>
+      <div id="chart-legend" class="chart-legend"></div>
+    </section>
+    <section class="editor__table">
+      <div class="table-wrapper">
+        <table id="polar-table"></table>
+      </div>
+      <div class="table-actions">
+        <button id="btn-add-twa" class="btn btn--small">+ Ligne TWA</button>
+        <button id="btn-add-tws" class="btn btn--small">+ Colonne TWS</button>
+        <div id="ref-toggle" class="ref-toggle" hidden>
+          <button class="btn btn--small ref-toggle__btn ref-toggle__btn--active" data-mode="absolu">Absolu</button>
+          <button class="btn btn--small ref-toggle__btn" data-mode="delta">±Δ</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="polaires.js"></script>
+</body>
+</html>
