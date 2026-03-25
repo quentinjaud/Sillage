@@ -27,7 +27,7 @@ export default function BarreOutilsPolaires({
 
   // Charger l'index des polaires de reference
   useEffect(() => {
-    fetch('/polaires/polarlib/index.json')
+    fetch('/polarlib/index.json')
       .then(r => r.json())
       .then((noms: string[]) => setListeRef(noms))
       .catch(() => setListeRef([]));
@@ -73,7 +73,7 @@ export default function BarreOutilsPolaires({
       }
 
       // Charger depuis la bibliotheque
-      fetch(`/polaires/polarlib/${val}.pol`)
+      fetch(`/polarlib/${val}.pol`)
         .then(r => r.text())
         .then(texte => {
           const parsed = parsePOL(texte);
